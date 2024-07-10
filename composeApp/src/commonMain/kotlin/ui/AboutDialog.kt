@@ -44,7 +44,7 @@ import fontweighttest.composeapp.generated.resources.view_source
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
-const val version = "v1.0.0"
+const val version = "v1.1.0"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

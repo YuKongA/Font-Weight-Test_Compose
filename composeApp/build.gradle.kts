@@ -13,7 +13,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
 
-version = "1.0.0"
+version = "1.1.0"
 val appName = "FontWeightTest"
 val pkgName = "top.yukonga.fontWeightTest"
 val xcf = XCFramework(appName + "Framework")
