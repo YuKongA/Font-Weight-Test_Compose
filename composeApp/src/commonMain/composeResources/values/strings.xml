@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Font Weight Test</string>
+    <string name="view_source">View Source:</string>
+    <string name="join_group">Join Group:</string>
+    <string name="opensource_info">Copyright © 2024 YuKongA</string>
+    <string name="home">Home</string>
+    <string name="sans_serif">Sans Serif</string>
+    <string name="serif">Serif</string>
+    <string name="font_weight">Common font weight remapping</string>
+    <string name="comparison_display">Font weight comparison display</string>
+    <string name="device_font">Device font:</string>
+    <string name="normal_font">Normal font:</string>
+    <string name="italic_font">Italic font:</string>
+    <string name="more_examples">More Examples:</string>
+</resources>

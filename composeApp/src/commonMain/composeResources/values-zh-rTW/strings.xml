@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title">字體字重測試</string>
+    <string name="view_source">查看原始碼:</string>
+    <string name="join_group">加入群組:</string>
+    <string name="opensource_info">版權所有 © 2024 YuKongA</string>
+    <string name="home">首頁</string>
+    <string name="sans_serif">無襯線</string>
+    <string name="serif">襯線</string>
+    <string name="font_weight">常用字重映射:</string>
+    <string name="comparison_display">字重對比顯示:</string>
+    <string name="device_font">設備字體:</string>
+    <string name="normal_font">普通字體:</string>
+    <string name="italic_font">傾斜字體:</string>
+    <string name="more_examples">更多範例:</string>
+</resources>
