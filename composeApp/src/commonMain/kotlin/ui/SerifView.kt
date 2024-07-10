@@ -26,30 +26,45 @@ import ui.components.WeightTextView
 fun SerifView() {
     val scrollState = rememberScrollState()
     Column(modifier = Modifier.padding(horizontal = 20.dp).verticalScroll(scrollState)) {
-        Text(
-            text = stringResource(Res.string.normal_font),
-            modifier = Modifier.padding(bottom = 8.dp),
-            fontSize = 16.sp
-        )
         CardView {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(Res.string.normal_font),
+                modifier = Modifier.padding(horizontal = 16.dp),
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
             WeightTextView(fontFamily = FontFamily.Serif)
+            Spacer(modifier = Modifier.height(16.dp))
         }
-        Text(
-            text = stringResource(Res.string.italic_font),
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-            fontSize = 16.sp
-        )
+        Spacer(modifier = Modifier.height(20.dp))
         CardView {
-            WeightTextView(fontStyle = FontStyle.Italic, fontFamily = FontFamily.Serif)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(Res.string.italic_font),
+                modifier = Modifier.padding(horizontal = 16.dp),
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            WeightTextView(
+                fontStyle = FontStyle.Italic,
+                fontFamily = FontFamily.Serif
+            )
+            Spacer(modifier = Modifier.height(16.dp))
         }
-        Text(
-            text = stringResource(Res.string.more_examples),
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-            fontSize = 16.sp
-        )
+        Spacer(modifier = Modifier.height(20.dp))
         CardView {
-            OtherTestView(fontFamily = FontFamily.Serif)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(Res.string.more_examples),
+                modifier = Modifier.padding(horizontal = 16.dp),
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            OtherTestView(FontFamily.Serif)
+            Spacer(modifier = Modifier.height(16.dp))
         }
         Spacer(modifier = Modifier.height(20.dp))
     }
 }
+

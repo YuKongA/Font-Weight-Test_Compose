@@ -1,24 +1,39 @@
 package ui
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fontweighttest.composeapp.generated.resources.MiSansVF
 import fontweighttest.composeapp.generated.resources.Res
 import fontweighttest.composeapp.generated.resources.comparison_display
+import fontweighttest.composeapp.generated.resources.custom_text
 import fontweighttest.composeapp.generated.resources.device_font
 import fontweighttest.composeapp.generated.resources.font_weight
+import fontweighttest.composeapp.generated.resources.variable_font
 import misc.fontWeightList
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
@@ -28,23 +43,41 @@ import ui.components.CardView
 fun HomeView() {
     val scrollState = rememberScrollState()
     Column(modifier = Modifier.padding(horizontal = 20.dp).verticalScroll(scrollState)) {
-        Text(
-            text = stringResource(Res.string.font_weight),
-            modifier = Modifier.padding(bottom = 8.dp),
-            fontSize = 16.sp
-        )
         CardView {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(Res.string.font_weight),
+                modifier = Modifier.padding(horizontal = 16.dp),
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
             AllWeightText()
+            Spacer(modifier = Modifier.height(16.dp))
         }
-        Text(
-            text = stringResource(Res.string.comparison_display),
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-            fontSize = 16.sp
-        )
+        Spacer(modifier = Modifier.height(20.dp))
         CardView {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(Res.string.comparison_display),
+                modifier = Modifier.padding(horizontal = 16.dp),
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
             DeviceFontTestView(stringResource(Res.string.device_font))
-            Spacer(modifier = Modifier.padding(top = 8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             MiSansTestView("MiSans VF:")
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        CardView {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(Res.string.variable_font),
+                modifier = Modifier.padding(horizontal = 16.dp),
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            SeekbarTestView()
+            Spacer(modifier = Modifier.height(16.dp))
         }
         Spacer(modifier = Modifier.height(20.dp))
     }
@@ -52,7 +85,7 @@ fun HomeView() {
 
 @Composable
 fun AllWeightText() {
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         WeightText("100 - 淡体 Thin (Hairline)", FontWeight.Thin)
         WeightText("200 - 特细 Extra Light (Ultra Light)", FontWeight.ExtraLight)
         WeightText("300 - 细体 Light", FontWeight.Light)
@@ -70,7 +103,7 @@ fun WeightText(description: String, fontWeight: FontWeight) {
     Text(
         text = description,
         fontWeight = fontWeight,
-        fontSize = 20.sp,
+        fontSize = 14.sp,
         maxLines = 1
     )
 }
@@ -82,7 +115,10 @@ fun MiSansTestView(text: String) {
             .padding(horizontal = 16.dp)
             .padding(bottom = 16.dp)
     ) {
-        Text(text = text)
+        Text(
+            text = text,
+            fontSize = 15.sp
+        )
         MiSansTest("永")
         MiSansTest("の")
         MiSansTest("A")
@@ -96,7 +132,7 @@ fun MiSansTest(text: String) {
         fontWeightList.forEach { fontWeight ->
             Text(
                 text = text,
-                fontSize = 20.sp,
+                fontSize = 14.sp,
                 fontFamily = FontFamily(Font(Res.font.MiSansVF, weight = fontWeight))
             )
         }
@@ -106,11 +142,12 @@ fun MiSansTest(text: String) {
 @Composable
 fun DeviceFontTestView(text: String) {
     Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .padding(top = 16.dp)
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Text(text = text)
+        Text(
+            text = text,
+            fontSize = 15.sp
+        )
         MoreTestText("永")
         MoreTestText("の")
         MoreTestText("A")
@@ -125,8 +162,53 @@ fun MoreTestText(text: String) {
             Text(
                 text = text,
                 fontWeight = fontWeight,
-                fontSize = 20.sp
+                fontSize = 14.sp
             )
         }
+    }
+}
+
+@Composable
+fun SeekbarTestView() {
+    val customText = remember { mutableStateOf("") }
+    val fontWeightValue = remember { mutableStateOf(400f) }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = if (customText.value != "") customText.value else "永 の A 6",
+            fontSize = 24.sp,
+            fontWeight = FontWeight(fontWeightValue.value.toInt())
+        )
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Slider(
+                value = fontWeightValue.value,
+                onValueChange = { newValue -> fontWeightValue.value = newValue },
+                interactionSource = interactionSource,
+                valueRange = 1f..999f,
+                modifier = Modifier.weight(1f)
+
+            )
+            Text(
+                text = fontWeightValue.value.toInt().toString(),
+                modifier = Modifier.padding(start = 8.dp).sizeIn(minWidth = 32.dp),
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+            )
+        }
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            value = customText.value,
+            onValueChange = { customText.value = it },
+            label = { Text(stringResource(Res.string.custom_text)) },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+        )
     }
 }

@@ -18,7 +18,7 @@ import misc.fontWeightList
 @Composable
 fun OtherTestView(fontFamily: FontFamily? = null) {
     Column(
-        modifier = Modifier.padding(all = 16.dp)
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
         OtherTestText(
             "不以物喜，不以己悲。 ——范仲淹《岳阳楼记》\n" +
