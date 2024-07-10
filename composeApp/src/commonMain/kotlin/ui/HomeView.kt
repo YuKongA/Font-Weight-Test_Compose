@@ -1,13 +1,10 @@
 package ui
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,8 +24,7 @@ import ui.components.CardView
 
 @Composable
 fun HomeView() {
-    val scrollState = rememberScrollState()
-    Column(modifier = Modifier.verticalScroll(scrollState)) {
+    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         Text(
             text = stringResource(Res.string.font_weight),
             modifier = Modifier.padding(bottom = 8.dp),
@@ -47,7 +43,7 @@ fun HomeView() {
             Spacer(modifier = Modifier.padding(top = 8.dp))
             MiSansTestView("MiSans VF:")
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
@@ -71,7 +67,7 @@ fun WeightText(description: String, fontWeight: FontWeight) {
     Text(
         text = description,
         fontWeight = fontWeight,
-        fontSize = 16.sp,
+        fontSize = 20.sp,
         maxLines = 1
     )
 }
@@ -97,7 +93,7 @@ fun MiSansTest(text: String) {
         fontWeightList.forEach { fontWeight ->
             Text(
                 text = text,
-                fontSize = 22.sp,
+                fontSize = 20.sp,
                 fontFamily = FontFamily(Font(Res.font.MiSansVF, weight = fontWeight))
             )
         }
@@ -126,7 +122,7 @@ fun MoreTestText(text: String) {
             Text(
                 text = text,
                 fontWeight = fontWeight,
-                fontSize = 22.sp
+                fontSize = 20.sp
             )
         }
     }

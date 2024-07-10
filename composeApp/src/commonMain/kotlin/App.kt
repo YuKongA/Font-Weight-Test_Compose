@@ -3,6 +3,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -15,17 +18,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import fontweighttest.composeapp.generated.resources.Res
 import fontweighttest.composeapp.generated.resources.app_name
 import fontweighttest.composeapp.generated.resources.home
@@ -34,7 +33,6 @@ import fontweighttest.composeapp.generated.resources.sans_serif
 import fontweighttest.composeapp.generated.resources.sans_serif_selected
 import fontweighttest.composeapp.generated.resources.serif
 import fontweighttest.composeapp.generated.resources.serif_selected
-import misc.RouteConfig
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ui.AboutDialog
@@ -45,8 +43,21 @@ import ui.SerifView
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
-    val navController = rememberNavController()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val pagerState = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f, pageCount = { 3 })
+    val selectedItem = remember { mutableStateOf(0) }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val isClickBottomBarChange = remember { mutableStateOf(false) }
+
+    LaunchedEffect(selectedItem.value) {
+        pagerState.animateScrollToPage(selectedItem.value)
+    }
+    LaunchedEffect(pagerState.currentPage) {
+        if (isClickBottomBarChange.value) {
+            isClickBottomBarChange.value = false
+        } else {
+            selectedItem.value = pagerState.currentPage
+        }
+    }
 
     AppTheme {
         Scaffold(
@@ -56,14 +67,13 @@ fun App() {
                 .background(TopAppBarDefaults.topAppBarColors().containerColor)
                 .displayCutoutPadding(),
             topBar = { TopAppBar(scrollBehavior) },
-            bottomBar = { BottomAppBar(navController) }
+            bottomBar = { BottomAppBar(selectedItem, isClickBottomBarChange) }
         ) { padding ->
             Column(
                 modifier = Modifier
                     .padding(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding())
-                    .padding(horizontal = 20.dp)
             ) {
-                setupNavHost(navController)
+                HorizontalPager(pagerState)
             }
         }
     }
@@ -92,12 +102,10 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
 }
 
 @Composable
-fun BottomAppBar(navController: NavHostController) {
-    val routes = listOf(
-        RouteConfig.HOME,
-        RouteConfig.SANS_SERIF,
-        RouteConfig.SERIF
-    )
+fun BottomAppBar(
+    selectedItem: MutableState<Int>,
+    isClickBottomBarChange: MutableState<Boolean>
+) {
     val labels = arrayOf(
         stringResource(Res.string.home),
         stringResource(Res.string.sans_serif),
@@ -113,26 +121,18 @@ fun BottomAppBar(navController: NavHostController) {
         painterResource(Res.drawable.sans_serif_selected),
         painterResource(Res.drawable.serif_selected)
     )
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
 
     NavigationBar {
-        routes.forEachIndexed { index, route ->
-            val isSelected = currentDestination?.hierarchy?.any { it.route == route } ?: false
-            val currentIcon = if (isSelected) selectedIcons[index] else normalIcons[index]
+        labels.forEachIndexed { index, item ->
+            val icon = if (selectedItem.value == index) selectedIcons[index] else normalIcons[index]
             NavigationBarItem(
-                label = { Text(labels[index]) },
-                icon = { Icon(currentIcon, contentDescription = labels[index]) },
-                selected = isSelected,
+                icon = { Icon(icon, contentDescription = item) },
+                label = { Text(text = item) },
                 alwaysShowLabel = false,
+                selected = selectedItem.value == index,
                 onClick = {
-                    navController.navigate(route) {
-                        popUpTo(navController.graph.findStartDestination().route!!) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    isClickBottomBarChange.value = true
+                    selectedItem.value = index
                 }
             )
         }
@@ -140,13 +140,16 @@ fun BottomAppBar(navController: NavHostController) {
 }
 
 @Composable
-fun setupNavHost(navController: NavHostController) {
-    NavHost(
-        navController = navController,
-        startDestination = RouteConfig.HOME,
-    ) {
-        composable(route = RouteConfig.HOME) { HomeView() }
-        composable(route = RouteConfig.SANS_SERIF) { SansSerifView() }
-        composable(route = RouteConfig.SERIF) { SerifView() }
-    }
+fun HorizontalPager(pagerState: PagerState) {
+    HorizontalPager(
+        verticalAlignment = Alignment.Top,
+        state = pagerState,
+        pageContent = { page ->
+            when (page) {
+                0 -> HomeView()
+                1 -> SansSerifView()
+                2 -> SerifView()
+            }
+        }
+    )
 }

@@ -23,7 +23,7 @@ fun WeightTextView(fontStyle: FontStyle = FontStyle.Normal, fontFamily: FontFami
                 fontWeight = fontWeight,
                 fontFamily = fontFamily,
                 fontStyle = fontStyle,
-                fontSize = 13.sp,
+                fontSize = 13.5.sp,
                 maxLines = 1
             )
         }

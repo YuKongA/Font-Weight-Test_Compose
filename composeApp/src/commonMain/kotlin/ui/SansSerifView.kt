@@ -24,7 +24,7 @@ import ui.components.WeightTextView
 @Composable
 fun SansSerifView() {
     val scrollState = rememberScrollState()
-    Column(modifier = Modifier.verticalScroll(scrollState)) {
+    Column(modifier = Modifier.padding(horizontal = 20.dp).verticalScroll(scrollState)) {
         Text(
             text = stringResource(Res.string.normal_font),
             modifier = Modifier.padding(bottom = 8.dp),
@@ -49,7 +49,7 @@ fun SansSerifView() {
         CardView {
             OtherTestView()
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
