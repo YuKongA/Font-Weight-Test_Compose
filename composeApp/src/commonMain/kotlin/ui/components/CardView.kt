@@ -1,5 +1,7 @@
 package ui.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -14,11 +16,14 @@ fun CardView(view: @Composable () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
             contentColor = MaterialTheme.colorScheme.onBackground,
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.background
         ),
-        elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                RoundedCornerShape(10.dp)
+            )
     ) {
         view()
     }

@@ -2,6 +2,13 @@ package misc
 
 import androidx.compose.ui.text.font.FontWeight
 
+
+object RouteConfig {
+    const val HOME = "home"
+    const val SANS_SERIF = "sans_serif"
+    const val SERIF = "serif"
+}
+
 val fontWeightList = listOf(
     FontWeight.Thin, // W100
     FontWeight.ExtraLight, // W200

@@ -1,9 +1,13 @@
 package ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,23 +27,27 @@ import ui.components.CardView
 
 @Composable
 fun HomeView() {
-    Text(
-        text = stringResource(Res.string.font_weight),
-        modifier = Modifier.padding(bottom = 8.dp),
-        fontSize = 16.sp
-    )
-    CardView {
-        AllWeightText()
-    }
-    Text(
-        text = stringResource(Res.string.comparison_display),
-        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-        fontSize = 16.sp
-    )
-    CardView {
-        DeviceFontTestView(stringResource(Res.string.device_font))
-        Spacer(modifier = Modifier.padding(top = 8.dp))
-        MiSansTestView("MiSans VF:")
+    val scrollState = rememberScrollState()
+    Column(modifier = Modifier.verticalScroll(scrollState)) {
+        Text(
+            text = stringResource(Res.string.font_weight),
+            modifier = Modifier.padding(bottom = 8.dp),
+            fontSize = 16.sp
+        )
+        CardView {
+            AllWeightText()
+        }
+        Text(
+            text = stringResource(Res.string.comparison_display),
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+            fontSize = 16.sp
+        )
+        CardView {
+            DeviceFontTestView(stringResource(Res.string.device_font))
+            Spacer(modifier = Modifier.padding(top = 8.dp))
+            MiSansTestView("MiSans VF:")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

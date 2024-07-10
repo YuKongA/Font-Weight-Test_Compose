@@ -60,6 +60,7 @@ fun AboutDialog() {
             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
         }) {
         Icon(
+            modifier = Modifier.size(32.dp),
             imageVector = vectorResource(Res.drawable.icon),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurface

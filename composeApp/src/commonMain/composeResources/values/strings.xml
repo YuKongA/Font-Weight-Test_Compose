@@ -7,8 +7,8 @@
     <string name="home">Home</string>
     <string name="sans_serif">Sans Serif</string>
     <string name="serif">Serif</string>
-    <string name="font_weight">Common font weight remapping</string>
-    <string name="comparison_display">Font weight comparison display</string>
+    <string name="font_weight">Common font weight remapping:</string>
+    <string name="comparison_display">Font weight comparison display:</string>
     <string name="device_font">Device font:</string>
     <string name="normal_font">Normal font:</string>
     <string name="italic_font">Italic font:</string>

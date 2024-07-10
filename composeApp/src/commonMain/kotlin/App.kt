@@ -1,19 +1,10 @@
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -24,14 +15,17 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import fontweighttest.composeapp.generated.resources.Res
 import fontweighttest.composeapp.generated.resources.app_name
 import fontweighttest.composeapp.generated.resources.home
@@ -40,6 +34,7 @@ import fontweighttest.composeapp.generated.resources.sans_serif
 import fontweighttest.composeapp.generated.resources.sans_serif_selected
 import fontweighttest.composeapp.generated.resources.serif
 import fontweighttest.composeapp.generated.resources.serif_selected
+import misc.RouteConfig
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ui.AboutDialog
@@ -50,37 +45,25 @@ import ui.SerifView
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
-    val selectedItem = remember { mutableStateOf(0) }
-
+    val navController = rememberNavController()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-
-    val offsetHeight by animateDpAsState(
-        targetValue = if (scrollBehavior.state.contentOffset <= -35) 80.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() else 0.dp,
-        animationSpec = tween(durationMillis = 300)
-    )
 
     AppTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .background(MaterialTheme.colorScheme.background)
+                .background(TopAppBarDefaults.topAppBarColors().containerColor)
                 .displayCutoutPadding(),
-            topBar = {
-                TopAppBar(scrollBehavior)
-            },
-            bottomBar = {
-                BottomAppBar(selectedItem, offsetHeight)
-            }
+            topBar = { TopAppBar(scrollBehavior) },
+            bottomBar = { BottomAppBar(navController) }
         ) { padding ->
-            LazyColumn(
+            Column(
                 modifier = Modifier
-                    .padding(top = padding.calculateTopPadding())
+                    .padding(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding())
                     .padding(horizontal = 20.dp)
             ) {
-                item {
-                    AppContent(selectedItem)
-                    Spacer(Modifier.height(padding.calculateBottomPadding()))
-                }
+                setupNavHost(navController)
             }
         }
     }
@@ -90,20 +73,18 @@ fun App() {
 @Composable
 private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
     TopAppBar(
-        modifier = Modifier.displayCutoutPadding(),
         title = {
             Text(
                 text = stringResource(Res.string.app_name),
-                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                maxLines = 1,
+                maxLines = 1
             )
         },
         colors = TopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            scrolledContainerColor = MaterialTheme.colorScheme.background,
+            containerColor = TopAppBarDefaults.topAppBarColors().containerColor,
+            scrolledContainerColor = TopAppBarDefaults.topAppBarColors().containerColor,
+            actionIconContentColor = TopAppBarDefaults.topAppBarColors().actionIconContentColor,
+            navigationIconContentColor = TopAppBarDefaults.topAppBarColors().navigationIconContentColor,
+            titleContentColor = TopAppBarDefaults.topAppBarColors().titleContentColor,
         ),
         actions = { AboutDialog() },
         scrollBehavior = scrollBehavior
@@ -111,65 +92,61 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
 }
 
 @Composable
-private fun BottomAppBar(selectedItem: MutableState<Int>, fabOffsetHeight: Dp) {
-    val titleItems = listOf(
+fun BottomAppBar(navController: NavHostController) {
+    val routes = listOf(
+        RouteConfig.HOME,
+        RouteConfig.SANS_SERIF,
+        RouteConfig.SERIF
+    )
+    val labels = arrayOf(
         stringResource(Res.string.home),
         stringResource(Res.string.sans_serif),
-        stringResource(Res.string.serif),
+        stringResource(Res.string.serif)
     )
-    val iconItems = listOf(
+    val normalIcons = listOf(
         painterResource(Res.drawable.home),
         painterResource(Res.drawable.sans_serif),
         painterResource(Res.drawable.serif)
     )
-    val selectedIconItems = listOf(
+    val selectedIcons = listOf(
         painterResource(Res.drawable.home_selected),
         painterResource(Res.drawable.sans_serif_selected),
         painterResource(Res.drawable.serif_selected)
     )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
-    NavigationBar(
-        modifier = Modifier.offset(y = fabOffsetHeight)
-    ) {
-        titleItems.forEachIndexed { index, item ->
-            val icon = if (selectedItem.value == index) selectedIconItems[index] else iconItems[index]
+    NavigationBar {
+        routes.forEachIndexed { index, route ->
+            val isSelected = currentDestination?.hierarchy?.any { it.route == route } ?: false
+            val currentIcon = if (isSelected) selectedIcons[index] else normalIcons[index]
             NavigationBarItem(
-                icon = { Icon(icon, contentDescription = item) },
-                label = {
-                    if (selectedItem.value == index) {
-                        Text(text = item)
+                label = { Text(labels[index]) },
+                icon = { Icon(currentIcon, contentDescription = labels[index]) },
+                selected = isSelected,
+                alwaysShowLabel = false,
+                onClick = {
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.findStartDestination().route!!) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                },
-                selected = selectedItem.value == index,
-                onClick = { selectedItem.value = index }
+                }
             )
         }
     }
 }
 
-
 @Composable
-fun AppContent(selectedItem: MutableState<Int>) {
-    when (selectedItem.value) {
-        0 -> HomeContent()
-        1 -> SansSerifContent()
-        2 -> SerifContent()
-        else -> HomeContent()
+fun setupNavHost(navController: NavHostController) {
+    NavHost(
+        navController = navController,
+        startDestination = RouteConfig.HOME,
+    ) {
+        composable(route = RouteConfig.HOME) { HomeView() }
+        composable(route = RouteConfig.SANS_SERIF) { SansSerifView() }
+        composable(route = RouteConfig.SERIF) { SerifView() }
     }
-}
-
-
-@Composable
-fun HomeContent() {
-    HomeView()
-}
-
-@Composable
-fun SansSerifContent() {
-    SansSerifView()
-}
-
-@Composable
-fun SerifContent() {
-    SerifView()
 }
