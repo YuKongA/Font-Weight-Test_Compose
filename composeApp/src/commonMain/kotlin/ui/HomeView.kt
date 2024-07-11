@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,7 +29,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fontweighttest.composeapp.generated.resources.MiSansVF
 import fontweighttest.composeapp.generated.resources.Res
 import fontweighttest.composeapp.generated.resources.comparison_display
 import fontweighttest.composeapp.generated.resources.custom_text
@@ -35,6 +36,7 @@ import fontweighttest.composeapp.generated.resources.device_font
 import fontweighttest.composeapp.generated.resources.font_weight
 import fontweighttest.composeapp.generated.resources.variable_font
 import misc.fontWeightList
+import misc.miSansList
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 import ui.components.CardView
@@ -129,11 +131,12 @@ fun MiSansTestView(text: String) {
 @Composable
 fun MiSansTest(text: String) {
     Row {
-        fontWeightList.forEach { fontWeight ->
+        fontWeightList.forEachIndexed { index, fontWeight ->
             Text(
                 text = text,
                 fontSize = 14.sp,
-                fontFamily = FontFamily(Font(Res.font.MiSansVF, weight = fontWeight))
+                fontWeight = fontWeight,
+                fontFamily = FontFamily(Font(miSansList[index], weight = fontWeight))
             )
         }
     }
@@ -198,13 +201,13 @@ fun SeekbarTestView() {
             Text(
                 text = fontWeightValue.value.toInt().toString(),
                 modifier = Modifier.padding(start = 8.dp).sizeIn(minWidth = 32.dp),
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.End,
                 fontSize = 16.sp,
             )
         }
-        OutlinedTextField(
+        TextField(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
             value = customText.value,
             onValueChange = { customText.value = it },
             label = { Text(stringResource(Res.string.custom_text)) },
