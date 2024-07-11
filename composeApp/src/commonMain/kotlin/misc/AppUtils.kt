@@ -12,7 +12,6 @@ import fontweighttest.composeapp.generated.resources.MiSans_SemiBold
 import fontweighttest.composeapp.generated.resources.MiSans_Thin
 import fontweighttest.composeapp.generated.resources.Res
 
-
 val fontWeightList = listOf(
     FontWeight.Thin, // W100
     FontWeight.ExtraLight, // W200
@@ -24,7 +23,6 @@ val fontWeightList = listOf(
     FontWeight.ExtraBold, // W800
     FontWeight.Black // W900
 )
-
 
 val miSansList = listOf(
     Res.font.MiSans_Thin, // W100

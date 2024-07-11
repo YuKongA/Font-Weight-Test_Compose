@@ -13,7 +13,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
 
-version = "1.1.0"
+version = "1.2.0"
 val appName = "FontWeightTest"
 val pkgName = "top.yukonga.fontWeightTest"
 val xcf = XCFramework(appName + "Framework")
@@ -101,7 +101,7 @@ android {
     packaging {
         applicationVariants.all {
             outputs.all {
-                (this as BaseVariantOutputImpl).outputFileName = "$appName-$versionName($versionCode)-$name.apk"
+                (this as BaseVariantOutputImpl).outputFileName = "$appName-v$versionName($versionCode)-$name.apk"
             }
         }
         resources.excludes += "**"

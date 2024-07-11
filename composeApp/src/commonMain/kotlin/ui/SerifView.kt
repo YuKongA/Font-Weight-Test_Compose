@@ -67,4 +67,3 @@ fun SerifView() {
         Spacer(modifier = Modifier.height(20.dp))
     }
 }
-

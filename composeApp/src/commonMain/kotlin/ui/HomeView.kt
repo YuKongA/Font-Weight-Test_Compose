@@ -89,13 +89,13 @@ fun HomeView() {
 fun AllWeightText() {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         WeightText("100 - 淡体 Thin (Hairline)", FontWeight.Thin)
-        WeightText("200 - 特细 Extra Light (Ultra Light)", FontWeight.ExtraLight)
+        WeightText("200 - 特细 ExtraLight (UltraLight)", FontWeight.ExtraLight)
         WeightText("300 - 细体 Light", FontWeight.Light)
         WeightText("400 - 标准 Normal (Regular)", FontWeight.Normal)
         WeightText("500 - 适中 Medium", FontWeight.Medium)
-        WeightText("600 - 次粗 Semi Bold (Demi Bold)", FontWeight.SemiBold)
+        WeightText("600 - 次粗 SemiBold (DemiBold)", FontWeight.SemiBold)
         WeightText("700 - 粗体 Bold", FontWeight.Bold)
-        WeightText("800 - 特粗 Extra Bold (Ultra Bold)", FontWeight.ExtraBold)
+        WeightText("800 - 特粗 ExtraBold (UltraBold)", FontWeight.ExtraBold)
         WeightText("900 - 浓体 Black (Heavy)", FontWeight.Black)
     }
 }
