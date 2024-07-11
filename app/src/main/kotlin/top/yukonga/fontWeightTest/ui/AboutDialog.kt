@@ -96,7 +96,7 @@ fun AboutDialog() {
                                 fontSize = MaterialTheme.typography.titleLarge.fontSize
                             )
                             Text(
-                                text = "v" + BuildConfig.VERSION_NAME,
+                                text = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
                                 modifier = Modifier,
                                 fontSize = MaterialTheme.typography.bodyMedium.fontSize
                             )

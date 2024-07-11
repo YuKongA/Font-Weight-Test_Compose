@@ -22,7 +22,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = getVersionCode()
-        versionName = "1.2.0" + getVersionName()
+        versionName = "1.3.0"
     }
     val properties = Properties()
     runCatching { properties.load(project.rootProject.file("local.properties").inputStream()) }
@@ -93,19 +93,6 @@ fun getVersionCode(): Int {
     val commitCount = getGitCommitCount()
     val major = 99
     return major + commitCount
-}
-
-fun getGitDescribe(): String {
-    val out = ByteArrayOutputStream()
-    exec {
-        commandLine("git", "describe", "--always")
-        standardOutput = out
-    }
-    return out.toString().trim()
-}
-
-fun getVersionName(): String {
-    return getGitDescribe()
 }
 
 dependencies {
