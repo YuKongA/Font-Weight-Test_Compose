@@ -1,5 +1,6 @@
 package top.yukonga.fontWeightTest.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -46,43 +48,84 @@ fun HomeView(height: Dp = 0.dp) {
             .padding(horizontal = 20.dp)
             .verticalScroll(scrollState)
     ) {
-        CardView {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.font_weight),
-                modifier = Modifier.padding(horizontal = 16.dp),
-                fontSize = 16.sp
-            )
-            Spacer(modifier = Modifier.height(4.dp))
+        CardViewTemplate(stringResource(R.string.font_weight)) {
             AllWeightText()
-            Spacer(modifier = Modifier.height(16.dp))
         }
-        Spacer(modifier = Modifier.height(20.dp))
-        CardView {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.comparison_display),
-                modifier = Modifier.padding(horizontal = 16.dp),
-                fontSize = 16.sp
-            )
-            Spacer(modifier = Modifier.height(4.dp))
+        SpacerTemplate(0.dp)
+        val orientation = LocalConfiguration.current.orientation
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            LandscapeContent()
+        } else {
+            PortraitContent()
+        }
+        SpacerTemplate(height)
+    }
+}
+
+
+@Composable
+fun CardViewTemplate(title: String, content: @Composable () -> Unit) {
+    CardView {
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = title,
+            modifier = Modifier.padding(horizontal = 16.dp),
+            fontSize = 16.sp
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        content()
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+fun SpacerTemplate(height: Dp) {
+    Spacer(modifier = Modifier.height(height + 20.dp))
+}
+
+@Composable
+fun LandscapeContent() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            CardViewTemplate(stringResource(R.string.comparison_display)) {
+                ComparisonDisplay()
+            }
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            CardViewTemplate(stringResource(R.string.variable_font)) {
+                SeekbarTestView()
+            }
+        }
+    }
+}
+
+@Composable
+fun PortraitContent() {
+    CardViewTemplate(stringResource(R.string.comparison_display)) {
+        ComparisonDisplay()
+    }
+    Spacer(modifier = Modifier.height(20.dp))
+    CardViewTemplate(stringResource(R.string.variable_font)) {
+        SeekbarTestView()
+    }
+}
+
+@Composable
+fun ComparisonDisplay() {
+    val orientation = LocalConfiguration.current.orientation
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             DeviceFontTestView(stringResource(R.string.device_font))
-            Spacer(modifier = Modifier.height(4.dp))
             MiSansTestView("MiSans VF:")
         }
-        Spacer(modifier = Modifier.height(20.dp))
-        CardView {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.variable_font),
-                modifier = Modifier.padding(horizontal = 16.dp),
-                fontSize = 16.sp
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            SeekbarTestView()
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        Spacer(modifier = Modifier.height(height + 20.dp))
+    } else {
+        DeviceFontTestView(stringResource(R.string.device_font))
+        MiSansTestView("MiSans VF:")
     }
 }
 
@@ -116,7 +159,6 @@ fun MiSansTestView(text: String) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp)
     ) {
         Text(
             text = text,

@@ -1,6 +1,5 @@
 package top.yukonga.fontWeightTest.misc
 
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import top.yukonga.fontWeightTest.R
 

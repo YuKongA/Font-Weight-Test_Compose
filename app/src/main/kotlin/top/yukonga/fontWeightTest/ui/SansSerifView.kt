@@ -1,6 +1,8 @@
 package top.yukonga.fontWeightTest.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -9,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,30 +32,69 @@ fun SansSerifView(height: Dp = 0.dp) {
             .padding(horizontal = 20.dp)
             .verticalScroll(scrollState)
     ) {
-        CardView {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.normal_font),
-                modifier = Modifier.padding(horizontal = 16.dp),
-                fontSize = 16.sp
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            WeightTextView()
-            Spacer(modifier = Modifier.height(16.dp))
+        val orientation = LocalConfiguration.current.orientation
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Row {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 20.dp)
+                ) {
+                    CardView {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(R.string.normal_font),
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        WeightTextView()
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    CardView {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(R.string.italic_font),
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        WeightTextView(fontStyle = FontStyle.Italic)
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+        } else {
+            CardView {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.normal_font),
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    fontSize = 16.sp
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                WeightTextView()
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            CardView {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.italic_font),
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    fontSize = 16.sp
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                WeightTextView(fontStyle = FontStyle.Italic)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            Spacer(modifier = Modifier.height(20.dp))
         }
-        Spacer(modifier = Modifier.height(20.dp))
-        CardView {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.italic_font),
-                modifier = Modifier.padding(horizontal = 16.dp),
-                fontSize = 16.sp
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            WeightTextView(fontStyle = FontStyle.Italic)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        Spacer(modifier = Modifier.height(20.dp))
         CardView {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
