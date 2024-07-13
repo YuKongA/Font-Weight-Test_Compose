@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.yukonga.fontWeightTest.R
@@ -38,7 +39,7 @@ import top.yukonga.fontWeightTest.ui.components.CardView
 
 @Preview
 @Composable
-fun HomeView() {
+fun HomeView(height: Dp = 0.dp) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -81,7 +82,7 @@ fun HomeView() {
             SeekbarTestView()
             Spacer(modifier = Modifier.height(16.dp))
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(height + 20.dp))
     }
 }
 

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.yukonga.fontWeightTest.R
@@ -21,11 +22,13 @@ import top.yukonga.fontWeightTest.ui.components.WeightTextView
 
 @Preview
 @Composable
-fun SansSerifView() {
+fun SansSerifView(height: Dp = 0.dp) {
     val scrollState = rememberScrollState()
-    Column(modifier = Modifier
-        .padding(horizontal = 20.dp)
-        .verticalScroll(scrollState)) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .verticalScroll(scrollState)
+    ) {
         CardView {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -61,6 +64,6 @@ fun SansSerifView() {
             OtherTestView()
             Spacer(modifier = Modifier.height(16.dp))
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(height + 20.dp))
     }
 }

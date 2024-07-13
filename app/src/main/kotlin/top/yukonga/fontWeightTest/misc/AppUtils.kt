@@ -1,5 +1,6 @@
 package top.yukonga.fontWeightTest.misc
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import top.yukonga.fontWeightTest.R
 
@@ -25,4 +26,16 @@ val miSansList = listOf(
     R.font.misans_bold, // W700
     R.font.misans_extrabold, // W800
     R.font.misans_black // W900
+)
+
+val navigationItems = listOf(
+    NavigationItem(R.string.home, R.drawable.home, R.drawable.home_selected),
+    NavigationItem(R.string.sans_serif, R.drawable.sans_serif, R.drawable.sans_serif_selected),
+    NavigationItem(R.string.serif, R.drawable.serif, R.drawable.serif_selected)
+)
+
+data class NavigationItem(
+    val label: Int,
+    val normalIcon: Int,
+    val selectedIcon: Int
 )

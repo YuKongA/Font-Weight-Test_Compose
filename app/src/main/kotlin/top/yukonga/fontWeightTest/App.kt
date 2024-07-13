@@ -1,9 +1,10 @@
 package top.yukonga.fontWeightTest
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.displayCutoutPadding
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -13,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
@@ -28,13 +30,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import top.yukonga.fontWeightTest.misc.NavigationItem
+import top.yukonga.fontWeightTest.misc.navigationItems
 import top.yukonga.fontWeightTest.ui.AboutDialog
 import top.yukonga.fontWeightTest.ui.HomeView
 import top.yukonga.fontWeightTest.ui.SansSerifView
 import top.yukonga.fontWeightTest.ui.SerifView
+import top.yukonga.fontWeightTest.ui.components.NavigationRailBottom
 import top.yukonga.fontWeightTest.ui.theme.AppTheme
 
 @Preview
@@ -47,6 +55,7 @@ fun App() {
     val isClickBottomBarChange = remember { mutableStateOf(false) }
 
     LaunchedEffect(selectedItem.intValue) {
+        scrollBehavior.snapAnimationSpec
         pagerState.animateScrollToPage(selectedItem.intValue)
     }
     LaunchedEffect(pagerState.currentPage) {
@@ -60,18 +69,37 @@ fun App() {
     AppTheme {
         Scaffold(
             modifier = Modifier
-                .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .background(TopAppBarDefaults.topAppBarColors().containerColor)
                 .displayCutoutPadding(),
-            topBar = { TopAppBar(scrollBehavior) },
-            bottomBar = { BottomAppBar(selectedItem, isClickBottomBarChange) }
+            topBar = {
+                val orientation = LocalConfiguration.current.orientation
+                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    TopAppBar(scrollBehavior)
+                }
+            },
+            bottomBar = {
+                val orientation = LocalConfiguration.current.orientation
+                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    NavigationBarView(selectedItem, isClickBottomBarChange)
+                }
+            }
         ) { padding ->
-            Column(
-                modifier = Modifier
-                    .padding(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding())
-            ) {
-                HorizontalPager(pagerState)
+            val orientation = LocalConfiguration.current.orientation
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                Row {
+                    NavigationRailView(selectedItem, isClickBottomBarChange)
+                    Column {
+                        TopAppBar(scrollBehavior)
+                        HorizontalPager(pagerState, padding.calculateBottomPadding())
+                    }
+                }
+            } else {
+                Column(
+                    Modifier.padding(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding())
+                ) {
+                    HorizontalPager(pagerState)
+                }
             }
         }
     }
@@ -100,54 +128,69 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
 }
 
 @Composable
-fun BottomAppBar(
+fun NavigationItemsView(
+    items: List<NavigationItem>,
+    selectedItem: MutableState<Int>,
+    isClickBottomBarChange: MutableState<Boolean>,
+    itemContent: @Composable (NavigationItem, Boolean, () -> Unit) -> Unit
+) {
+    items.forEachIndexed { index, item ->
+        val isSelected = selectedItem.value == index
+        itemContent(item, isSelected) {
+            isClickBottomBarChange.value = true
+            selectedItem.value = index
+        }
+    }
+}
+
+@Composable
+fun NavigationRailView(
     selectedItem: MutableState<Int>,
     isClickBottomBarChange: MutableState<Boolean>
 ) {
-    val labels = arrayOf(
-        stringResource(R.string.home),
-        stringResource(R.string.sans_serif),
-        stringResource(R.string.serif)
-    )
-    val normalIcons = listOf(
-        painterResource(R.drawable.home),
-        painterResource(R.drawable.sans_serif),
-        painterResource(R.drawable.serif)
-    )
-    val selectedIcons = listOf(
-        painterResource(R.drawable.home_selected),
-        painterResource(R.drawable.sans_serif_selected),
-        painterResource(R.drawable.serif_selected)
-    )
-
-    NavigationBar {
-        labels.forEachIndexed { index, item ->
-            val icon = if (selectedItem.value == index) selectedIcons[index] else normalIcons[index]
-            NavigationBarItem(
-                icon = { Icon(icon, contentDescription = item) },
-                label = { Text(text = item) },
+    NavigationRailBottom {
+        NavigationItemsView(navigationItems, selectedItem, isClickBottomBarChange) { item, isSelected, onClick ->
+            NavigationRailItem(
+                icon = { Icon(painterResource(if (isSelected) item.selectedIcon else item.normalIcon), contentDescription = stringResource(item.label)) },
+                label = { Text(text = stringResource(item.label)) },
                 alwaysShowLabel = false,
-                selected = selectedItem.value == index,
-                onClick = {
-                    isClickBottomBarChange.value = true
-                    selectedItem.value = index
-                }
+                selected = isSelected,
+                onClick = onClick
             )
         }
     }
 }
 
 @Composable
-fun HorizontalPager(pagerState: PagerState) {
+fun NavigationBarView(
+    selectedItem: MutableState<Int>,
+    isClickBottomBarChange: MutableState<Boolean>
+) {
+    NavigationBar {
+        NavigationItemsView(navigationItems, selectedItem, isClickBottomBarChange) { item, isSelected, onClick ->
+            NavigationBarItem(
+                icon = { Icon(painterResource(if (isSelected) item.selectedIcon else item.normalIcon), contentDescription = stringResource(item.label)) },
+                label = { Text(text = stringResource(item.label)) },
+                alwaysShowLabel = false,
+                selected = isSelected,
+                onClick = onClick
+            )
+        }
+    }
+}
+
+@Composable
+fun HorizontalPager(pagerState: PagerState, calculateBottomPadding: Dp = 0.dp) {
     HorizontalPager(
         verticalAlignment = Alignment.Top,
         state = pagerState,
         beyondViewportPageCount = 1,
         pageContent = { page ->
             when (page) {
-                0 -> HomeView()
-                1 -> SansSerifView()
-                2 -> SerifView()
+                0 -> HomeView(calculateBottomPadding)
+                1 -> SansSerifView(calculateBottomPadding)
+                2 -> SerifView(calculateBottomPadding)
+
             }
         }
     )
