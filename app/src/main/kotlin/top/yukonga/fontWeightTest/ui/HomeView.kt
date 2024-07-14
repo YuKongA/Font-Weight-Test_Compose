@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,7 +50,8 @@ fun HomeView(
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp)
-            .verticalScroll(scrollState),
+            .verticalScroll(scrollState)
+            .systemBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         CardView {

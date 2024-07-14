@@ -3,11 +3,9 @@ package top.yukonga.fontWeightTest.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -35,6 +33,7 @@ fun SerifView(
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .verticalScroll(scrollState)
+            .systemBarsPadding()
     ) {
         if (layoutType != NavigationSuiteType.NavigationBar) {
             Row {
@@ -83,6 +82,5 @@ fun SerifView(
             OtherTestView(fontFamily = FontFamily.Serif)
         }
         Spacer(modifier = Modifier.height(20.dp))
-        Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
     }
 }
