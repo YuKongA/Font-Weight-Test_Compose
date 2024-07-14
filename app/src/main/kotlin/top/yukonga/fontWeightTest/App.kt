@@ -1,5 +1,8 @@
 package top.yukonga.fontWeightTest
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +46,7 @@ import top.yukonga.fontWeightTest.ui.theme.AppTheme
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("SourceLockedOrientationActivity")
 fun App() {
     val pagerState = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f, pageCount = { 3 })
     val selectedItem = remember { mutableIntStateOf(0) }
@@ -80,6 +85,10 @@ fun App() {
                     TopAppBar(currentScrollBehavior)
                 }
             ) { padding ->
+                val context = LocalContext.current
+                if (layoutType == NavigationSuiteType.NavigationBar) {
+                    (context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
                 Column(
                     Modifier.padding(top = padding.calculateTopPadding())
                 ) {
@@ -155,7 +164,6 @@ fun HorizontalPager(
         verticalAlignment = Alignment.Top,
         state = pagerState,
         beyondViewportPageCount = 1,
-        userScrollEnabled = false,
         pageContent = { page ->
             when (page) {
                 0 -> HomeView(layoutType, topAppBarScrollBehaviorList[0])
