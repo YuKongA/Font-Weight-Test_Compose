@@ -1,6 +1,9 @@
 package top.yukonga.fontWeightTest.misc
 
 import androidx.compose.ui.text.font.FontWeight
+import androidx.window.core.layout.WindowHeightSizeClass
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
 import top.yukonga.fontWeightTest.R
 
 val fontWeightList = listOf(
@@ -38,3 +41,5 @@ data class NavigationItem(
     val normalIcon: Int,
     val selectedIcon: Int
 )
+
+fun WindowSizeClass.isCompact() = windowWidthSizeClass == WindowWidthSizeClass.COMPACT || windowHeightSizeClass == WindowHeightSizeClass.COMPACT

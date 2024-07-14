@@ -15,8 +15,6 @@ class MainActivity : ComponentActivity() {
             window.isNavigationBarContrastEnforced = false
         }
 
-        setContent {
-            App()
-        }
+        setContent { App() }
     }
 }

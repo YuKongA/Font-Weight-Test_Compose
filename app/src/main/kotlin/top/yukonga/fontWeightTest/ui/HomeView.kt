@@ -1,15 +1,16 @@
 package top.yukonga.fontWeightTest.ui
 
-import android.content.res.Configuration
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,13 +18,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -31,7 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.yukonga.fontWeightTest.R
@@ -41,8 +41,11 @@ import top.yukonga.fontWeightTest.ui.components.CardView
 
 @Preview
 @Composable
-fun HomeView(height: Dp = 0.dp) {
+fun HomeView(
+    layoutType: NavigationSuiteType = NavigationSuiteType.NavigationBar
+) {
     val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -53,18 +56,17 @@ fun HomeView(height: Dp = 0.dp) {
             Text(text = stringResource(R.string.font_weight))
             AllWeightText()
         }
-        val orientation = LocalConfiguration.current.orientation
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            LandscapeContent()
+        if (layoutType != NavigationSuiteType.NavigationBar) {
+            LandscapeContent(layoutType)
         } else {
-            PortraitContent()
+            PortraitContent(layoutType)
         }
-        Spacer(modifier = Modifier.height(height))
+        Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
     }
 }
 
 @Composable
-fun LandscapeContent() {
+fun LandscapeContent(layoutType: NavigationSuiteType) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
@@ -72,7 +74,7 @@ fun LandscapeContent() {
         Column(modifier = Modifier.weight(1f)) {
             CardView {
                 Text(text = stringResource(R.string.comparison_display))
-                ComparisonDisplay()
+                ComparisonDisplay(layoutType)
             }
         }
         Column(modifier = Modifier.weight(1f)) {
@@ -85,13 +87,13 @@ fun LandscapeContent() {
 }
 
 @Composable
-fun PortraitContent() {
+fun PortraitContent(layoutType: NavigationSuiteType) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         CardView {
             Text(text = stringResource(R.string.comparison_display))
-            ComparisonDisplay()
+            ComparisonDisplay(layoutType)
         }
         CardView {
             Text(text = stringResource(R.string.variable_font))
@@ -101,9 +103,8 @@ fun PortraitContent() {
 }
 
 @Composable
-fun ComparisonDisplay() {
-    val orientation = LocalConfiguration.current.orientation
-    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+fun ComparisonDisplay(layoutType: NavigationSuiteType) {
+    if (layoutType != NavigationSuiteType.NavigationBar) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -144,10 +145,7 @@ fun WeightText(description: String, fontWeight: FontWeight) {
 @Composable
 fun MiSansTestView(text: String) {
     Column {
-        Text(
-            text = text,
-            fontSize = 15.sp
-        )
+        Text(text = text, fontSize = 15.sp)
         MiSansTest("永")
         MiSansTest("の")
         MiSansTest("A")
@@ -172,10 +170,7 @@ fun MiSansTest(text: String) {
 @Composable
 fun DeviceFontTestView(text: String) {
     Column {
-        Text(
-            text = text,
-            fontSize = 15.sp
-        )
+        Text(text = text, fontSize = 15.sp)
         MoreTestText("永")
         MoreTestText("の")
         MoreTestText("A")

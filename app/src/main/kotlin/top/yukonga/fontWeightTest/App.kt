@@ -12,7 +12,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowSize
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,10 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import androidx.window.core.layout.WindowWidthSizeClass
+import top.yukonga.fontWeightTest.misc.isCompact
 import top.yukonga.fontWeightTest.misc.navigationItems
 import top.yukonga.fontWeightTest.ui.AboutDialog
 import top.yukonga.fontWeightTest.ui.HomeView
@@ -55,7 +61,7 @@ fun App() {
     }
 
     AppTheme {
-        NavigationSuiteScaffold(selectedItem, isClickBottomBarChange) {
+        NavigationSuiteScaffold(selectedItem, isClickBottomBarChange) { layoutType ->
             Scaffold(
                 modifier = Modifier
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -67,7 +73,7 @@ fun App() {
                 Column(
                     Modifier.padding(top = padding.calculateTopPadding())
                 ) {
-                    HorizontalPager(pagerState, padding.calculateBottomPadding())
+                    HorizontalPager(pagerState, layoutType)
                 }
             }
         }
@@ -94,9 +100,19 @@ private fun TopAppBar() {
 fun NavigationSuiteScaffold(
     selectedItem: MutableState<Int>,
     isClickBottomBarChange: MutableState<Boolean>,
-    content: @Composable () -> Unit
+    content: @Composable (layoutType: NavigationSuiteType) -> Unit
 ) {
+    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val windowSize = with(LocalDensity.current) { currentWindowSize().toSize().toDpSize() }
+    val navLayoutType = when {
+        adaptiveInfo.windowPosture.isTabletop -> NavigationSuiteType.NavigationBar
+        adaptiveInfo.windowSizeClass.isCompact() -> NavigationSuiteType.NavigationBar
+        adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED && windowSize.width >= 1200.dp -> NavigationSuiteType.NavigationDrawer
+        else -> NavigationSuiteType.NavigationRail
+    }
+
     NavigationSuiteScaffold(
+        layoutType = navLayoutType,
         navigationSuiteItems = {
             navigationItems.forEachIndexed { index, item ->
                 val isSelected = selectedItem.value == index
@@ -113,21 +129,24 @@ fun NavigationSuiteScaffold(
             }
         }
     ) {
-        content()
+        content(navLayoutType)
     }
 }
 
 @Composable
-fun HorizontalPager(pagerState: PagerState, calculateBottomPadding: Dp = 0.dp) {
+fun HorizontalPager(
+    pagerState: PagerState,
+    layoutType: NavigationSuiteType
+) {
     HorizontalPager(
         verticalAlignment = Alignment.Top,
         state = pagerState,
         beyondViewportPageCount = 1,
         pageContent = { page ->
             when (page) {
-                0 -> HomeView(calculateBottomPadding)
-                1 -> SansSerifView(calculateBottomPadding)
-                2 -> SerifView(calculateBottomPadding)
+                0 -> HomeView(layoutType)
+                1 -> SansSerifView(layoutType)
+                2 -> SerifView(layoutType)
             }
         }
     )

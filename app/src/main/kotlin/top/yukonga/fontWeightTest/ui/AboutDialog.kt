@@ -44,7 +44,6 @@ import top.yukonga.fontWeightTest.R
 @Composable
 fun AboutDialog() {
     var showDialog by remember { mutableStateOf(false) }
-
     val hapticFeedback = LocalHapticFeedback.current
 
     IconButton(

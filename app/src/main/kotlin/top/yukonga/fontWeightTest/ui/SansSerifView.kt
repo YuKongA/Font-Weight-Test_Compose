@@ -1,17 +1,19 @@
 package top.yukonga.fontWeightTest.ui
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,15 +26,17 @@ import top.yukonga.fontWeightTest.ui.components.WeightTextView
 
 @Preview
 @Composable
-fun SansSerifView(height: Dp = 0.dp) {
+fun SansSerifView(
+    layoutType: NavigationSuiteType = NavigationSuiteType.NavigationBar
+) {
     val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .verticalScroll(scrollState)
     ) {
-        val orientation = LocalConfiguration.current.orientation
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (layoutType != NavigationSuiteType.NavigationBar) {
             Row {
                 Column(
                     modifier = Modifier
@@ -70,6 +74,7 @@ fun SansSerifView(height: Dp = 0.dp) {
             Text(text = stringResource(R.string.more_examples))
             OtherTestView()
         }
-        Spacer(modifier = Modifier.height(height + 20.dp))
+        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
     }
 }
