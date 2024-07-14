@@ -1,8 +1,6 @@
 package top.yukonga.fontWeightTest
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -11,10 +9,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -30,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,11 +45,23 @@ import top.yukonga.fontWeightTest.ui.theme.AppTheme
 fun App() {
     val pagerState = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f, pageCount = { 3 })
     val selectedItem = remember { mutableIntStateOf(0) }
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+
+    val topAppBarScrollBehavior0 = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val topAppBarScrollBehavior1 = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val topAppBarScrollBehavior2 = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+    val topAppBarScrollBehaviorList = listOf(topAppBarScrollBehavior0, topAppBarScrollBehavior1, topAppBarScrollBehavior2)
+
+    val currentScrollBehavior = when (pagerState.currentPage) {
+        0 -> topAppBarScrollBehaviorList[0]
+        1 -> topAppBarScrollBehaviorList[1]
+        2 -> topAppBarScrollBehaviorList[2]
+        else -> throw IllegalStateException("Unsupported page")
+    }
+
     val isClickBottomBarChange = remember { mutableStateOf(false) }
 
     LaunchedEffect(selectedItem.intValue) {
-        scrollBehavior.snapAnimationSpec
         pagerState.animateScrollToPage(selectedItem.intValue)
     }
     LaunchedEffect(pagerState.currentPage) {
@@ -68,19 +75,15 @@ fun App() {
     AppTheme {
         NavigationSuiteScaffold(selectedItem, isClickBottomBarChange) { layoutType ->
             Scaffold(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .displayCutoutPadding()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-                    .background(MaterialTheme.colorScheme.background),
+                modifier = Modifier.fillMaxSize(),
                 topBar = {
-                    TopAppBar(scrollBehavior)
+                    TopAppBar(currentScrollBehavior)
                 }
             ) { padding ->
                 Column(
                     Modifier.padding(top = padding.calculateTopPadding())
                 ) {
-                    HorizontalPager(pagerState, layoutType)
+                    HorizontalPager(pagerState, layoutType, topAppBarScrollBehaviorList)
                 }
             }
         }
@@ -97,13 +100,6 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
                 maxLines = 1
             )
         },
-        colors = TopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            scrolledContainerColor = MaterialTheme.colorScheme.background,
-        ),
         actions = {
             AboutDialog()
         },
@@ -148,20 +144,23 @@ fun NavigationSuiteScaffold(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HorizontalPager(
     pagerState: PagerState,
-    layoutType: NavigationSuiteType
+    layoutType: NavigationSuiteType,
+    topAppBarScrollBehaviorList: List<TopAppBarScrollBehavior>
 ) {
     HorizontalPager(
         verticalAlignment = Alignment.Top,
         state = pagerState,
         beyondViewportPageCount = 1,
+        userScrollEnabled = false,
         pageContent = { page ->
             when (page) {
-                0 -> HomeView(layoutType)
-                1 -> SansSerifView(layoutType)
-                2 -> SerifView(layoutType)
+                0 -> HomeView(layoutType, topAppBarScrollBehaviorList[0])
+                1 -> SansSerifView(layoutType, topAppBarScrollBehaviorList[1])
+                2 -> SerifView(layoutType, topAppBarScrollBehaviorList[2])
             }
         }
     )
