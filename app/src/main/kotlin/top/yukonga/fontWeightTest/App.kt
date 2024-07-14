@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -15,7 +14,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowSize
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -29,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,7 +50,7 @@ import top.yukonga.fontWeightTest.ui.theme.AppTheme
 fun App() {
     val pagerState = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f, pageCount = { 3 })
     val selectedItem = remember { mutableIntStateOf(0) }
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val isClickBottomBarChange = remember { mutableStateOf(false) }
 
     LaunchedEffect(selectedItem.intValue) {
@@ -68,11 +70,11 @@ fun App() {
             Scaffold(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .systemBarsPadding()
-                    .displayCutoutPadding(),
+                    .displayCutoutPadding()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .background(MaterialTheme.colorScheme.background),
                 topBar = {
-                    TopAppBar()
+                    TopAppBar(scrollBehavior)
                 }
             ) { padding ->
                 Column(
@@ -87,7 +89,7 @@ fun App() {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun TopAppBar() {
+private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -95,9 +97,17 @@ private fun TopAppBar() {
                 maxLines = 1
             )
         },
+        colors = TopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            scrolledContainerColor = MaterialTheme.colorScheme.background,
+        ),
         actions = {
             AboutDialog()
-        }
+        },
+        scrollBehavior = scrollBehavior
     )
 }
 

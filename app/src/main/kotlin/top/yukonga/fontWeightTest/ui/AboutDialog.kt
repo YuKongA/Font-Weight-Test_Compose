@@ -66,6 +66,7 @@ fun AboutDialog() {
                 Column(
                     modifier = Modifier
                         .clip(RoundedCornerShape(30.dp))
+                        .widthIn(min = 350.dp, max = 380.dp)
                         .background(MaterialTheme.colorScheme.surfaceContainer),
                 ) {
                     Row(
