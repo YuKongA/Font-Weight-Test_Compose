@@ -46,41 +46,21 @@ fun HomeView(height: Dp = 0.dp) {
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp)
-            .verticalScroll(scrollState)
+            .verticalScroll(scrollState),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        CardViewTemplate(stringResource(R.string.font_weight)) {
+        CardView {
+            Text(text = stringResource(R.string.font_weight))
             AllWeightText()
         }
-        SpacerTemplate(0.dp)
         val orientation = LocalConfiguration.current.orientation
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             LandscapeContent()
         } else {
             PortraitContent()
         }
-        SpacerTemplate(height)
+        Spacer(modifier = Modifier.height(height))
     }
-}
-
-
-@Composable
-fun CardViewTemplate(title: String, content: @Composable () -> Unit) {
-    CardView {
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = title,
-            modifier = Modifier.padding(horizontal = 16.dp),
-            fontSize = 16.sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        content()
-        Spacer(modifier = Modifier.height(16.dp))
-    }
-}
-
-@Composable
-fun SpacerTemplate(height: Dp) {
-    Spacer(modifier = Modifier.height(height + 20.dp))
 }
 
 @Composable
@@ -90,12 +70,14 @@ fun LandscapeContent() {
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            CardViewTemplate(stringResource(R.string.comparison_display)) {
+            CardView {
+                Text(text = stringResource(R.string.comparison_display))
                 ComparisonDisplay()
             }
         }
         Column(modifier = Modifier.weight(1f)) {
-            CardViewTemplate(stringResource(R.string.variable_font)) {
+            CardView {
+                Text(text = stringResource(R.string.variable_font))
                 SeekbarTestView()
             }
         }
@@ -104,12 +86,17 @@ fun LandscapeContent() {
 
 @Composable
 fun PortraitContent() {
-    CardViewTemplate(stringResource(R.string.comparison_display)) {
-        ComparisonDisplay()
-    }
-    Spacer(modifier = Modifier.height(20.dp))
-    CardViewTemplate(stringResource(R.string.variable_font)) {
-        SeekbarTestView()
+    Column(
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        CardView {
+            Text(text = stringResource(R.string.comparison_display))
+            ComparisonDisplay()
+        }
+        CardView {
+            Text(text = stringResource(R.string.variable_font))
+            SeekbarTestView()
+        }
     }
 }
 
@@ -131,7 +118,7 @@ fun ComparisonDisplay() {
 
 @Composable
 fun AllWeightText() {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column {
         WeightText("100 - 淡体 Thin (Hairline)", FontWeight.Thin)
         WeightText("200 - 特细 ExtraLight (UltraLight)", FontWeight.ExtraLight)
         WeightText("300 - 细体 Light", FontWeight.Light)
@@ -156,10 +143,7 @@ fun WeightText(description: String, fontWeight: FontWeight) {
 
 @Composable
 fun MiSansTestView(text: String) {
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-    ) {
+    Column {
         Text(
             text = text,
             fontSize = 15.sp
@@ -187,9 +171,7 @@ fun MiSansTest(text: String) {
 
 @Composable
 fun DeviceFontTestView(text: String) {
-    Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
-    ) {
+    Column {
         Text(
             text = text,
             fontSize = 15.sp
@@ -221,8 +203,7 @@ fun SeekbarTestView() {
     val interactionSource = remember { MutableInteractionSource() }
 
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
             text = if (customText.value != "") customText.value else "永 の A 6",
@@ -239,15 +220,13 @@ fun SeekbarTestView() {
                 interactionSource = interactionSource,
                 valueRange = 1f..999f,
                 modifier = Modifier.weight(1f)
-
             )
             Text(
                 text = fontWeightValue.floatValue.toInt().toString(),
                 modifier = Modifier
                     .padding(start = 8.dp)
                     .sizeIn(minWidth = 32.dp),
-                textAlign = TextAlign.End,
-                fontSize = 16.sp,
+                textAlign = TextAlign.End
             )
         }
         TextField(

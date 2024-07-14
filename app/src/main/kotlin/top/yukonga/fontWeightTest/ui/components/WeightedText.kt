@@ -13,9 +13,7 @@ import top.yukonga.fontWeightTest.misc.fontWeightList
 
 @Composable
 fun WeightTextView(fontStyle: FontStyle = FontStyle.Normal, fontFamily: FontFamily? = null) {
-    Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
-    ) {
+    Column {
         val text = "伤仲永 にほんご 한국어 ABCD abcd 0123"
         fontWeightList.forEachIndexed { index, fontWeight ->
             Text(
