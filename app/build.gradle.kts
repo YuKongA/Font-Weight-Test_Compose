@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import java.io.ByteArrayOutputStream
 import java.util.Properties
@@ -13,6 +11,7 @@ plugins {
 val appName = "FontWeightTest"
 val pkgName = "top.yukonga.fontWeightTest"
 
+@Suppress("UnstableApiUsage")
 android {
     namespace = pkgName
     compileSdk = 35
@@ -22,7 +21,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = getVersionCode()
-        versionName = "1.3.0"
+        versionName = "1.4.0"
     }
     val properties = Properties()
     runCatching { properties.load(project.rootProject.file("local.properties").inputStream()) }
@@ -68,8 +67,8 @@ android {
         }
     }
     dependenciesInfo.includeInApk = false
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-    kotlin.jvmToolchain(17)
+    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+    kotlin.jvmToolchain(21)
     packaging {
         applicationVariants.all {
             outputs.all {
