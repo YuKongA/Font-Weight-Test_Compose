@@ -15,4 +15,9 @@
     <string name="normal_font">Normal font:</string>
     <string name="italic_font">Italic font:</string>
     <string name="more_examples">More Examples:</string>
+    <string name="extension_settings">Extension settings</string>
+    <string name="dark_theme">Display mode</string>
+    <string name="system_default">System default</string>
+    <string name="light_mode">Light mode</string>
+    <string name="dark_mode">Dark mode</string>
 </resources>

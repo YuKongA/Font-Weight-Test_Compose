@@ -15,4 +15,9 @@
     <string name="normal_font">普通字体:</string>
     <string name="italic_font">倾斜字体:</string>
     <string name="more_examples">更多示例:</string>
+    <string name="extension_settings">扩展设置</string>
+    <string name="dark_theme">显示模式</string>
+    <string name="system_default">跟随系统</string>
+    <string name="light_mode">浅色模式</string>
+    <string name="dark_mode">深色模式</string>
 </resources>

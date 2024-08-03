@@ -1,7 +1,5 @@
-package top.yukonga.fontWeightTest.misc
+package top.yukonga.fontWeightTest.utils
 
-import android.content.Context
-import android.content.res.Configuration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.window.core.layout.WindowHeightSizeClass
 import androidx.window.core.layout.WindowSizeClass
@@ -45,5 +43,3 @@ data class NavigationItem(
 )
 
 fun WindowSizeClass.isCompact() = windowWidthSizeClass == WindowWidthSizeClass.COMPACT || windowHeightSizeClass == WindowHeightSizeClass.COMPACT
-
-fun isDarkMode(context: Context): Boolean = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES

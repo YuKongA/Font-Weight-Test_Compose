@@ -38,9 +38,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.yukonga.fontWeightTest.R
-import top.yukonga.fontWeightTest.misc.fontWeightList
-import top.yukonga.fontWeightTest.misc.miSansList
 import top.yukonga.fontWeightTest.ui.components.CardView
+import top.yukonga.fontWeightTest.utils.fontWeightList
+import top.yukonga.fontWeightTest.utils.miSansList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

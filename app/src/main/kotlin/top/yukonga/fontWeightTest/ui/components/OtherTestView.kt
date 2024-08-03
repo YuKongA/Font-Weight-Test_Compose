@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import top.yukonga.fontWeightTest.misc.fontWeightList
+import top.yukonga.fontWeightTest.utils.fontWeightList
 
 @Composable
 fun OtherTestView(fontFamily: FontFamily? = null) {

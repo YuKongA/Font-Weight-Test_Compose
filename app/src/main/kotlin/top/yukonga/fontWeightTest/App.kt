@@ -36,18 +36,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.window.core.layout.WindowWidthSizeClass
-import top.yukonga.fontWeightTest.misc.isCompact
-import top.yukonga.fontWeightTest.misc.navigationItems
 import top.yukonga.fontWeightTest.ui.AboutDialog
 import top.yukonga.fontWeightTest.ui.HomeView
 import top.yukonga.fontWeightTest.ui.SansSerifView
 import top.yukonga.fontWeightTest.ui.SerifView
+import top.yukonga.fontWeightTest.ui.TuneDialog
 import top.yukonga.fontWeightTest.ui.theme.AppTheme
+import top.yukonga.fontWeightTest.utils.Preferences
+import top.yukonga.fontWeightTest.utils.isCompact
+import top.yukonga.fontWeightTest.utils.navigationItems
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SourceLockedOrientationActivity")
-fun App() {
+fun App(
+    colorMode: MutableState<Int> = remember { mutableIntStateOf(Preferences().perfGet("colorMode")?.toInt() ?: 0) }
+) {
     val pagerState = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f, pageCount = { 3 })
     val selectedItem = remember { mutableIntStateOf(0) }
 
@@ -77,12 +81,12 @@ fun App() {
         }
     }
 
-    AppTheme {
+    AppTheme(colorMode = colorMode.value) {
         NavigationSuiteScaffold(selectedItem, isClickBottomBarChange) { layoutType ->
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
-                    TopAppBar(currentScrollBehavior)
+                    TopAppBar(currentScrollBehavior, colorMode)
                 }
             ) { padding ->
                 val context = LocalContext.current
@@ -101,7 +105,7 @@ fun App() {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
+private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, colorMode: MutableState<Int>) {
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -109,9 +113,8 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
                 maxLines = 1
             )
         },
-        actions = {
-            AboutDialog()
-        },
+        navigationIcon = { AboutDialog() },
+        actions = { TuneDialog(colorMode) },
         scrollBehavior = scrollBehavior
     )
 }
