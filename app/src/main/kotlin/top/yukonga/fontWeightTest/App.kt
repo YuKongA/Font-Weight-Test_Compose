@@ -96,7 +96,7 @@ fun App(
                 Column(
                     Modifier.padding(top = padding.calculateTopPadding())
                 ) {
-                    HorizontalPager(pagerState, layoutType, topAppBarScrollBehaviorList)
+                    HorizontalPager(pagerState, layoutType, topAppBarScrollBehaviorList, colorMode.value)
                 }
             }
         }
@@ -161,7 +161,8 @@ fun NavigationSuiteScaffold(
 fun HorizontalPager(
     pagerState: PagerState,
     layoutType: NavigationSuiteType,
-    topAppBarScrollBehaviorList: List<TopAppBarScrollBehavior>
+    topAppBarScrollBehaviorList: List<TopAppBarScrollBehavior>,
+    colorMode: Int
 ) {
     HorizontalPager(
         verticalAlignment = Alignment.Top,
@@ -169,7 +170,7 @@ fun HorizontalPager(
         beyondViewportPageCount = 1,
         pageContent = { page ->
             when (page) {
-                0 -> HomeView(layoutType, topAppBarScrollBehaviorList[0])
+                0 -> HomeView(layoutType, topAppBarScrollBehaviorList[0], colorMode)
                 1 -> SansSerifView(layoutType, topAppBarScrollBehaviorList[1])
                 2 -> SerifView(layoutType, topAppBarScrollBehaviorList[2])
             }
