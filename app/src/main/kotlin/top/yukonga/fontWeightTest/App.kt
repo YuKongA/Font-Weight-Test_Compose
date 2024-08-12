@@ -25,8 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.window.core.layout.WindowWidthSizeClass
+import kotlinx.coroutines.launch
 import top.yukonga.fontWeightTest.ui.AboutDialog
 import top.yukonga.fontWeightTest.ui.HomeView
 import top.yukonga.fontWeightTest.ui.SansSerifView
@@ -68,21 +70,14 @@ fun App(
         else -> throw IllegalStateException("Unsupported page")
     }
 
-    val isClickBottomBarChange = remember { mutableStateOf(false) }
-
-    LaunchedEffect(selectedItem.intValue) {
-        pagerState.animateScrollToPage(selectedItem.intValue)
-    }
-    LaunchedEffect(pagerState.currentPage) {
-        if (isClickBottomBarChange.value) {
-            isClickBottomBarChange.value = false
-        } else {
-            selectedItem.intValue = pagerState.currentPage
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            selectedItem.intValue = page
         }
     }
 
     AppTheme(colorMode = colorMode.value) {
-        NavigationSuiteScaffold(selectedItem, isClickBottomBarChange) { layoutType ->
+        NavigationSuiteScaffold(selectedItem, pagerState) { layoutType ->
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
@@ -122,7 +117,7 @@ private fun TopAppBar(scrollBehavior: TopAppBarScrollBehavior, colorMode: Mutabl
 @Composable
 fun NavigationSuiteScaffold(
     selectedItem: MutableState<Int>,
-    isClickBottomBarChange: MutableState<Boolean>,
+    pagerState: PagerState,
     content: @Composable (layoutType: NavigationSuiteType) -> Unit
 ) {
     val adaptiveInfo = currentWindowAdaptiveInfo()
@@ -133,6 +128,8 @@ fun NavigationSuiteScaffold(
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED && windowSize.width >= 1200.dp -> NavigationSuiteType.NavigationDrawer
         else -> NavigationSuiteType.NavigationRail
     }
+
+    val coroutineScope = rememberCoroutineScope()
 
     NavigationSuiteScaffold(
         layoutType = navLayoutType,
@@ -145,8 +142,9 @@ fun NavigationSuiteScaffold(
                     alwaysShowLabel = false,
                     selected = isSelected,
                     onClick = {
-                        isClickBottomBarChange.value = true
-                        selectedItem.value = index
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
                     }
                 )
             }
