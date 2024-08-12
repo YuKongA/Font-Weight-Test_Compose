@@ -37,6 +37,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.window.core.layout.WindowWidthSizeClass
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import top.yukonga.fontWeightTest.ui.AboutDialog
 import top.yukonga.fontWeightTest.ui.HomeView
@@ -48,13 +51,13 @@ import top.yukonga.fontWeightTest.utils.Preferences
 import top.yukonga.fontWeightTest.utils.isCompact
 import top.yukonga.fontWeightTest.utils.navigationItems
 
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SourceLockedOrientationActivity")
+@Composable
+@OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
 fun App(
     colorMode: MutableState<Int> = remember { mutableIntStateOf(Preferences().perfGet("colorMode")?.toInt() ?: 0) }
 ) {
-    val pagerState = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f, pageCount = { 3 })
+    val pagerState = rememberPagerState(pageCount = { 3 })
     val selectedItem = remember { mutableIntStateOf(0) }
 
     val topAppBarScrollBehavior0 = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -71,7 +74,7 @@ fun App(
     }
 
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect { page ->
+        snapshotFlow { pagerState.currentPage }.debounce(100).collectLatest { page ->
             selectedItem.intValue = page
         }
     }
@@ -128,7 +131,6 @@ fun NavigationSuiteScaffold(
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED && windowSize.width >= 1200.dp -> NavigationSuiteType.NavigationDrawer
         else -> NavigationSuiteType.NavigationRail
     }
-
     val coroutineScope = rememberCoroutineScope()
 
     NavigationSuiteScaffold(
