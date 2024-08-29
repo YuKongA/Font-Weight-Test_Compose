@@ -59,16 +59,15 @@ android {
             isShrinkResources = true
             vcsInfo.include = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName(if (keystorePath != null) "github" else "release")
         }
         debug {
-            if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
+            if (keystorePath != null) signingConfig = signingConfigs.getByName("github")
             applicationIdSuffix = ".debug"
         }
     }
     dependenciesInfo.includeInApk = false
-    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-    kotlin.jvmToolchain(21)
+    kotlin.jvmToolchain(17)
     packaging {
         applicationVariants.all {
             outputs.all {
