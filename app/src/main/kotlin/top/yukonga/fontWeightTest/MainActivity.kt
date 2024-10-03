@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
                 )
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    window.isNavigationBarContrastEnforced = false // Xiaomi moment, this code must be here
+                    window.isNavigationBarContrastEnforced = false
                 }
 
                 onDispose {}

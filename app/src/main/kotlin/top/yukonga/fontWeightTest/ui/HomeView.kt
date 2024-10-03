@@ -14,9 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -215,7 +214,8 @@ fun SliderTestView(colorMode: Int) {
     val fontWeightValue = remember { mutableFloatStateOf(400f) }
     val interactionSource = remember { MutableInteractionSource() }
     val inputText = remember { mutableStateOf(fontWeightValue.floatValue.toInt().toString()) }
-    val textWidthDp = with(LocalDensity.current) { rememberTextMeasurer().measure(text = "999", style = MaterialTheme.typography.bodyMedium).size.width.toDp() }
+    val textWidthDp =
+        with(LocalDensity.current) { rememberTextMeasurer().measure(text = "1000", style = MaterialTheme.typography.bodyMedium).size.width.toDp() }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -251,8 +251,7 @@ fun SliderTestView(colorMode: Int) {
                 },
                 modifier = Modifier
                     .padding(start = 8.dp)
-                    .wrapContentSize()
-                    .widthIn(max = textWidthDp),
+                    .width(textWidthDp),
                 textStyle = TextStyle(
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface,
