@@ -33,7 +33,8 @@ val miSansList = listOf(
 val navigationItems = listOf(
     NavigationItem(R.string.home, R.drawable.home, R.drawable.home_selected),
     NavigationItem(R.string.sans_serif, R.drawable.sans_serif, R.drawable.sans_serif_selected),
-    NavigationItem(R.string.serif, R.drawable.serif, R.drawable.serif_selected)
+    NavigationItem(R.string.serif, R.drawable.serif, R.drawable.serif_selected),
+    NavigationItem(R.string.monospace, R.drawable.sans_serif, R.drawable.sans_serif_selected),
 )
 
 data class NavigationItem(

@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import top.yukonga.fontWeightTest.ui.AboutDialog
 import top.yukonga.fontWeightTest.ui.HomeView
+import top.yukonga.fontWeightTest.ui.MonospaceView
 import top.yukonga.fontWeightTest.ui.SansSerifView
 import top.yukonga.fontWeightTest.ui.SerifView
 import top.yukonga.fontWeightTest.ui.TuneDialog
@@ -57,20 +58,21 @@ import top.yukonga.fontWeightTest.utils.navigationItems
 fun App(
     colorMode: MutableState<Int> = remember { mutableIntStateOf(Preferences().perfGet("colorMode")?.toInt() ?: 0) }
 ) {
-    val pagerState = rememberPagerState(pageCount = { 3 })
+    val pagerState = rememberPagerState(pageCount = { 4 })
     val selectedItem = remember { mutableIntStateOf(0) }
 
     val topAppBarScrollBehavior0 = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val topAppBarScrollBehavior1 = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val topAppBarScrollBehavior2 = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val topAppBarScrollBehavior3 = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    val topAppBarScrollBehaviorList = listOf(topAppBarScrollBehavior0, topAppBarScrollBehavior1, topAppBarScrollBehavior2)
+    val topAppBarScrollBehaviorList = listOf(topAppBarScrollBehavior0, topAppBarScrollBehavior1, topAppBarScrollBehavior2, topAppBarScrollBehavior3)
 
     val currentScrollBehavior = when (pagerState.currentPage) {
         0 -> topAppBarScrollBehaviorList[0]
         1 -> topAppBarScrollBehaviorList[1]
         2 -> topAppBarScrollBehaviorList[2]
-        else -> throw IllegalStateException("Unsupported page")
+        else -> topAppBarScrollBehaviorList[3]
     }
 
     LaunchedEffect(pagerState) {
@@ -173,6 +175,7 @@ fun HorizontalPager(
                 0 -> HomeView(layoutType, topAppBarScrollBehaviorList[0], colorMode)
                 1 -> SansSerifView(layoutType, topAppBarScrollBehaviorList[1])
                 2 -> SerifView(layoutType, topAppBarScrollBehaviorList[2])
+                else -> MonospaceView(layoutType, topAppBarScrollBehaviorList[2])
             }
         }
     )

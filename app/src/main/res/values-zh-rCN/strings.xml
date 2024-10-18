@@ -7,6 +7,7 @@
     <string name="home">首页</string>
     <string name="sans_serif">无衬线</string>
     <string name="serif">衬线</string>
+    <string name="monospace">等宽</string>
     <string name="font_weight">常用字重映射:</string>
     <string name="comparison_display">字重对比显示:</string>
     <string name="variable_font">可变字体测试:</string>
