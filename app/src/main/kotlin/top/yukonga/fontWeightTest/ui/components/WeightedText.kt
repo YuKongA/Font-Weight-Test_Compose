@@ -1,12 +1,12 @@
 package top.yukonga.fontWeightTest.ui.components
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
 import top.yukonga.fontWeightTest.utils.fontWeightList
+import top.yukonga.miuix.kmp.basic.Text
 
 @Composable
 fun WeightTextView(fontStyle: FontStyle = FontStyle.Normal, fontFamily: FontFamily? = null) {
@@ -18,7 +18,7 @@ fun WeightTextView(fontStyle: FontStyle = FontStyle.Normal, fontFamily: FontFami
                 fontWeight = fontWeight,
                 fontFamily = fontFamily,
                 fontStyle = fontStyle,
-                fontSize = 13.5.sp,
+                fontSize = 15.4.sp,
                 maxLines = 1
             )
         }

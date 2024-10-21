@@ -21,7 +21,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = getVersionCode()
-        versionName = "1.4.1"
+        versionName = "1.5.0"
     }
     val properties = Properties()
     runCatching { properties.load(project.rootProject.file("local.properties").inputStream()) }
@@ -96,12 +96,13 @@ fun getVersionCode(): Int {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
 
-    implementation(libs.androidx.compose.material3.adaptive.navigationSuite)
+    implementation(libs.miuix)
+    implementation(libs.haze)
 
     debugImplementation(libs.androidx.ui.tooling)
 }

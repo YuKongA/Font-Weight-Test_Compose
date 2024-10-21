@@ -1,42 +1,29 @@
 package top.yukonga.fontWeightTest.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -51,87 +38,57 @@ import top.yukonga.fontWeightTest.R
 import top.yukonga.fontWeightTest.ui.components.CardView
 import top.yukonga.fontWeightTest.utils.fontWeightList
 import top.yukonga.fontWeightTest.utils.miSansList
+import top.yukonga.miuix.kmp.basic.LazyColumn
+import top.yukonga.miuix.kmp.basic.ScrollBehavior
+import top.yukonga.miuix.kmp.basic.Slider
+import top.yukonga.miuix.kmp.basic.SmallTitle
+import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.basic.TextField
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(
-    layoutType: NavigationSuiteType,
-    topAppBarScrollBehavior: TopAppBarScrollBehavior,
-    colorMode: Int
+    topAppBarScrollBehavior: ScrollBehavior,
+    padding: PaddingValues
 ) {
-    val scrollState = rememberScrollState()
-
-    Column(
+    LazyColumn(
         modifier = Modifier
-            .padding(horizontal = 20.dp)
             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
-            .verticalScroll(scrollState)
-            .navigationBarsPadding(),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        CardView {
-            Text(text = stringResource(R.string.font_weight))
-            AllWeightText()
-        }
-        if (layoutType != NavigationSuiteType.NavigationBar) {
-            LandscapeContent(layoutType, colorMode)
-        } else {
-            PortraitContent(layoutType, colorMode)
-        }
-        Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
-    }
-}
-
-@Composable
-fun LandscapeContent(layoutType: NavigationSuiteType, colorMode: Int) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
+        item {
+            Spacer(Modifier.height(12.dp + padding.calculateTopPadding()))
             CardView {
-                Text(text = stringResource(R.string.comparison_display))
-                ComparisonDisplay(layoutType)
+                AllWeightText()
             }
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            CardView {
-                Text(text = stringResource(R.string.variable_font))
-                SliderTestView(colorMode)
-            }
+            PortraitContent()
+            Spacer(Modifier.height(padding.calculateBottomPadding() + 12.dp))
         }
     }
 }
 
 @Composable
-fun PortraitContent(layoutType: NavigationSuiteType, colorMode: Int) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        CardView {
-            Text(text = stringResource(R.string.comparison_display))
-            ComparisonDisplay(layoutType)
-        }
-        CardView {
-            Text(text = stringResource(R.string.variable_font))
-            SliderTestView(colorMode)
-        }
+fun PortraitContent() {
+    SmallTitle(
+        text = stringResource(R.string.comparison_display),
+        modifier = Modifier.padding(top = 12.dp)
+    )
+    CardView {
+        ComparisonDisplay()
+    }
+    SmallTitle(
+        text = stringResource(R.string.variable_font),
+        modifier = Modifier.padding(top = 12.dp)
+    )
+    CardView {
+        SliderTestView()
     }
 }
 
 @Composable
-fun ComparisonDisplay(layoutType: NavigationSuiteType) {
-    if (layoutType != NavigationSuiteType.NavigationBar) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            DeviceFontTestView(stringResource(R.string.device_font))
-            MiSansTestView("MiSans VF:")
-        }
-    } else {
-        DeviceFontTestView(stringResource(R.string.device_font))
-        MiSansTestView("MiSans VF:")
-    }
+fun ComparisonDisplay() {
+    DeviceFontTestView(stringResource(R.string.device_font))
+    Spacer(Modifier.height(6.dp))
+    MiSansTestView("MiSans VF:")
 }
 
 @Composable
@@ -154,7 +111,6 @@ fun WeightText(description: String, fontWeight: FontWeight) {
     Text(
         text = description,
         fontWeight = fontWeight,
-        fontSize = 14.sp,
         maxLines = 1
     )
 }
@@ -162,7 +118,7 @@ fun WeightText(description: String, fontWeight: FontWeight) {
 @Composable
 fun MiSansTestView(text: String) {
     Column {
-        Text(text = text, fontSize = 15.sp)
+        Text(text = text)
         MiSansTest("永")
         MiSansTest("の")
         MiSansTest("A")
@@ -176,7 +132,6 @@ fun MiSansTest(text: String) {
         fontWeightList.forEachIndexed { index, fontWeight ->
             Text(
                 text = text,
-                fontSize = 14.sp,
                 fontWeight = fontWeight,
                 fontFamily = FontFamily(Font(miSansList[index], weight = fontWeight))
             )
@@ -187,7 +142,7 @@ fun MiSansTest(text: String) {
 @Composable
 fun DeviceFontTestView(text: String) {
     Column {
-        Text(text = text, fontSize = 15.sp)
+        Text(text = text)
         MoreTestText("永")
         MoreTestText("の")
         MoreTestText("A")
@@ -201,21 +156,20 @@ fun MoreTestText(text: String) {
         fontWeightList.forEach { fontWeight ->
             Text(
                 text = text,
-                fontWeight = fontWeight,
-                fontSize = 14.sp
+                fontWeight = fontWeight
             )
         }
     }
 }
 
 @Composable
-fun SliderTestView(colorMode: Int) {
+fun SliderTestView() {
     val customText = remember { mutableStateOf("") }
     val fontWeightValue = remember { mutableFloatStateOf(400f) }
-    val interactionSource = remember { MutableInteractionSource() }
     val inputText = remember { mutableStateOf(fontWeightValue.floatValue.toInt().toString()) }
     val textWidthDp =
-        with(LocalDensity.current) { rememberTextMeasurer().measure(text = "1000", style = MaterialTheme.typography.bodyMedium).size.width.toDp() }
+        with(LocalDensity.current) { rememberTextMeasurer().measure(text = "1000", style = MiuixTheme.textStyles.main).size.width.toDp() }
+    val focusManager = LocalFocusManager.current
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -225,18 +179,9 @@ fun SliderTestView(colorMode: Int) {
             fontSize = 24.sp,
             fontWeight = FontWeight(fontWeightValue.floatValue.toInt())
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Slider(
-                modifier = Modifier.weight(1f),
-                value = fontWeightValue.floatValue,
-                onValueChange = { newValue ->
-                    fontWeightValue.floatValue = newValue
-                    inputText.value = newValue.toInt().toString()
-                },
-                interactionSource = interactionSource,
-                valueRange = 1f..999f
+        Row {
+            Text(
+                text = "Font Weight: "
             )
             BasicTextField(
                 value = inputText.value,
@@ -250,40 +195,46 @@ fun SliderTestView(colorMode: Int) {
                     }
                 },
                 modifier = Modifier
-                    .padding(start = 8.dp)
                     .width(textWidthDp),
                 textStyle = TextStyle(
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontStyle = MaterialTheme.typography.bodyMedium.fontStyle
+                    color = MiuixTheme.colorScheme.onBackground
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 decorationBox = {
                     Column {
                         it()
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(1.5.dp)
-                                .background(
-                                    when (colorMode) {
-                                        1 -> Color.LightGray
-                                        2 -> Color.DarkGray
-                                        else -> if (isSystemInDarkTheme()) Color.DarkGray else Color.LightGray
-                                    }
-                                )
+                                .height(0.8.dp)
+                                .background(if (isSystemInDarkTheme()) Color.DarkGray else Color.LightGray)
                         )
                     }
                 }
             )
         }
+        Slider(
+            modifier = Modifier.padding(top = 6.dp),
+            progress = fontWeightValue.floatValue,
+            onProgressChange = { newValue ->
+                fontWeightValue.floatValue = newValue
+                inputText.value = newValue.toInt().toString()
+            },
+            minValue = 1f,
+            maxValue = 999f
+        )
         TextField(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            cornerRadius = 14.dp,
             value = customText.value,
             onValueChange = { customText.value = it },
-            label = { Text(stringResource(R.string.custom_text)) },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+            label = stringResource(R.string.custom_text),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
         )
     }
 }

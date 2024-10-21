@@ -8,17 +8,10 @@
     <string name="sans_serif">无衬线</string>
     <string name="serif">衬线</string>
     <string name="monospace">等宽</string>
-    <string name="font_weight">常用字重映射:</string>
-    <string name="comparison_display">字重对比显示:</string>
-    <string name="variable_font">可变字体测试:</string>
+    <string name="comparison_display">字重对比显示</string>
+    <string name="variable_font">可变字体测试</string>
     <string name="custom_text">自定义文本</string>
-    <string name="device_font">设备字体:</string>
-    <string name="normal_font">普通字体:</string>
-    <string name="italic_font">倾斜字体:</string>
-    <string name="more_examples">更多示例:</string>
-    <string name="extension_settings">扩展设置</string>
-    <string name="dark_theme">显示模式</string>
-    <string name="system_default">跟随系统</string>
-    <string name="light_mode">浅色模式</string>
-    <string name="dark_mode">深色模式</string>
+    <string name="device_font">设备字体</string>
+    <string name="italic_font">倾斜字体</string>
+    <string name="more_examples">更多示例</string>
 </resources>

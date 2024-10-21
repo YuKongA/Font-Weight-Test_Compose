@@ -1,17 +1,9 @@
 package top.yukonga.fontWeightTest.ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -23,68 +15,48 @@ import top.yukonga.fontWeightTest.R
 import top.yukonga.fontWeightTest.ui.components.CardView
 import top.yukonga.fontWeightTest.ui.components.OtherTestView
 import top.yukonga.fontWeightTest.ui.components.WeightTextView
+import top.yukonga.miuix.kmp.basic.LazyColumn
+import top.yukonga.miuix.kmp.basic.ScrollBehavior
+import top.yukonga.miuix.kmp.basic.SmallTitle
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SerifView(
-    layoutType: NavigationSuiteType,
-    topAppBarScrollBehavior: TopAppBarScrollBehavior,
+    topAppBarScrollBehavior: ScrollBehavior,
+    padding: PaddingValues
 ) {
-    val scrollState = rememberScrollState()
-
-    Column(
+    LazyColumn(
         modifier = Modifier
-            .padding(horizontal = 20.dp)
             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
-            .verticalScroll(scrollState)
-            .navigationBarsPadding()
     ) {
-        if (layoutType != NavigationSuiteType.NavigationBar) {
-            Row {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 20.dp)
-                ) {
-                    CardView {
-                        Text(text = stringResource(R.string.normal_font))
-                        WeightTextView(fontFamily = FontFamily.Serif)
-                    }
-                }
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    CardView {
-                        Text(text = stringResource(R.string.italic_font))
-                        WeightTextView(
-                            fontStyle = FontStyle.Italic,
-                            fontFamily = FontFamily.Serif
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-        } else {
+        item {
+            Spacer(modifier = Modifier.height(12.dp + padding.calculateTopPadding()))
             CardView {
-                Text(text = stringResource(R.string.normal_font))
                 WeightTextView(
                     fontFamily = FontFamily.Serif
                 )
             }
-            Spacer(modifier = Modifier.height(20.dp))
+            SmallTitle(
+                modifier = Modifier.padding(top = 12.dp),
+                text = stringResource(R.string.italic_font),
+            )
             CardView {
-                Text(text = stringResource(R.string.italic_font))
                 WeightTextView(
                     fontStyle = FontStyle.Italic,
                     fontFamily = FontFamily.Serif
                 )
             }
-            Spacer(modifier = Modifier.height(20.dp))
+            SmallTitle(
+                modifier = Modifier.padding(top = 12.dp),
+                text = stringResource(R.string.more_examples),
+            )
         }
-        CardView {
-            Text(text = stringResource(R.string.more_examples))
-            OtherTestView(fontFamily = FontFamily.Serif)
+        item {
+            CardView {
+                OtherTestView(
+                    fontFamily = FontFamily.Serif
+                )
+            }
+            Spacer(Modifier.height(padding.calculateBottomPadding() + 12.dp))
         }
-        Spacer(modifier = Modifier.height(20.dp))
     }
 }
