@@ -1,10 +1,7 @@
 package top.yukonga.fontWeightTest.utils
 
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import top.yukonga.fontWeightTest.R
-import top.yukonga.miuix.kmp.basic.NavigationItem
 
 val fontWeightList = listOf(
     FontWeight.Thin, // W100
