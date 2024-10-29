@@ -100,7 +100,9 @@ fun AboutDialog() {
                 modifier = Modifier.padding(top = 12.dp)
             ) {
                 val uriHandler = LocalUriHandler.current
-                Row {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
                         text = stringResource(R.string.view_source) + " "
                     )
@@ -117,7 +119,9 @@ fun AboutDialog() {
                         )
                     )
                 }
-                Row {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
                         text = stringResource(R.string.join_group) + " "
                     )
