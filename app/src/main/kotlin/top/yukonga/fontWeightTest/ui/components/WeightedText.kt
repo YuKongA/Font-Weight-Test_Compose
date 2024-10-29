@@ -11,7 +11,7 @@ import top.yukonga.miuix.kmp.basic.Text
 @Composable
 fun WeightTextView(fontStyle: FontStyle = FontStyle.Normal, fontFamily: FontFamily? = null) {
     Column {
-        val text = "伤仲永 にほんご 한국어 ABCD abcd 0123"
+        val text = "伤仲永 にほんご 한국어 ABC abc 123"
         fontWeightList.forEachIndexed { index, fontWeight ->
             Text(
                 text = "${(index + 1) * 100} - $text",
