@@ -1,5 +1,4 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
-import java.io.ByteArrayOutputStream
 import java.util.Properties
 
 plugins {
@@ -63,11 +62,10 @@ android {
         }
         debug {
             if (keystorePath != null) signingConfig = signingConfigs.getByName("github")
-            applicationIdSuffix = ".debug"
         }
     }
     dependenciesInfo.includeInApk = false
-    kotlin.jvmToolchain(17)
+    kotlin.jvmToolchain(21)
     packaging {
         applicationVariants.all {
             outputs.all {

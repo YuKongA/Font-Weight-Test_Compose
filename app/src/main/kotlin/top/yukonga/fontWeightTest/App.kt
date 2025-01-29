@@ -20,8 +20,8 @@ import androidx.compose.ui.util.lerp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
-import dev.chrisbanes.haze.haze
-import dev.chrisbanes.haze.hazeChild
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -51,7 +51,10 @@ fun App() {
         val topAppBarScrollBehavior3 = MiuixScrollBehavior(rememberTopAppBarState())
 
         val topAppBarScrollBehaviorList = listOf(
-            topAppBarScrollBehavior0, topAppBarScrollBehavior1, topAppBarScrollBehavior2, topAppBarScrollBehavior3
+            topAppBarScrollBehavior0,
+            topAppBarScrollBehavior1,
+            topAppBarScrollBehavior2,
+            topAppBarScrollBehavior3
         )
 
         val pagerState = rememberPagerState(pageCount = { 4 })
@@ -66,10 +69,22 @@ fun App() {
         }
 
         val navigationItems = listOf(
-            NavigationItem(stringResource(R.string.home), ImageVector.vectorResource(R.drawable.home)),
-            NavigationItem(stringResource(R.string.sans_serif), ImageVector.vectorResource(R.drawable.sans_serif)),
-            NavigationItem(stringResource(R.string.serif), ImageVector.vectorResource(R.drawable.serif)),
-            NavigationItem(stringResource(R.string.monospace), ImageVector.vectorResource(R.drawable.monospace)),
+            NavigationItem(
+                stringResource(R.string.home),
+                ImageVector.vectorResource(R.drawable.home)
+            ),
+            NavigationItem(
+                stringResource(R.string.sans_serif),
+                ImageVector.vectorResource(R.drawable.sans_serif)
+            ),
+            NavigationItem(
+                stringResource(R.string.serif),
+                ImageVector.vectorResource(R.drawable.serif)
+            ),
+            NavigationItem(
+                stringResource(R.string.monospace),
+                ImageVector.vectorResource(R.drawable.monospace)
+            ),
         )
 
         LaunchedEffect(pagerState) {
@@ -102,11 +117,10 @@ fun App() {
             topBar = {
                 TopAppBar(
                     color = Color.Transparent,
-                    modifier = Modifier
-                        .hazeChild(
-                            state = hazeState,
-                            style = hazeStyleTopAppBar
-                        ),
+                    modifier = Modifier.hazeEffect(
+                        state = hazeState,
+                        style = hazeStyleTopAppBar
+                    ),
                     title = stringResource(R.string.app_name),
                     navigationIcon = { AboutDialog() },
                     scrollBehavior = currentScrollBehavior
@@ -115,7 +129,7 @@ fun App() {
             bottomBar = {
                 NavigationBar(
                     color = Color.Transparent,
-                    modifier = Modifier.hazeChild(
+                    modifier = Modifier.hazeEffect(
                         state = hazeState,
                         style = hazeStyleNavigationBar
                     ),
@@ -131,7 +145,9 @@ fun App() {
             }
         ) { padding ->
             HorizontalPager(
-                modifier = Modifier.fillMaxSize().haze(state = hazeState),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .hazeSource(state = hazeState),
                 pagerState = pagerState,
                 pageContent = { page ->
                     when (page) {
