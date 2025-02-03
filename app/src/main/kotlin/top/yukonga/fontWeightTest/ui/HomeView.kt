@@ -88,7 +88,7 @@ fun PortraitContent() {
 fun ComparisonDisplay() {
     DeviceFontTestView(stringResource(R.string.device_font))
     Spacer(Modifier.height(6.dp))
-    MiSansTestView("MiSans VF:")
+    MiSansTestView("MiSans VF")
 }
 
 @Composable
