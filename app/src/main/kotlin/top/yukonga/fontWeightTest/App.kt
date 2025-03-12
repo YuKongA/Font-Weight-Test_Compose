@@ -96,18 +96,16 @@ fun App() {
         val hazeState = remember { HazeState() }
 
         val hazeStyleTopAppBar = HazeStyle(
-            blurRadius = 25.dp,
-            backgroundColor = if (currentScrollBehavior.state.heightOffset > -1) Color.Transparent else MiuixTheme.colorScheme.background,
+            backgroundColor = MiuixTheme.colorScheme.background,
             tint = HazeTint(
                 MiuixTheme.colorScheme.background.copy(
-                    if (currentScrollBehavior.state.heightOffset > -1) 1f
-                    else lerp(1f, 0.67f, (currentScrollBehavior.state.heightOffset + 1) / -143f)
+                    if (currentScrollBehavior.state.collapsedFraction <= 0f) 1f
+                    else lerp(1f, 0.67f, (currentScrollBehavior.state.collapsedFraction))
                 )
             )
         )
 
         val hazeStyleNavigationBar = HazeStyle(
-            blurRadius = 25.dp,
             backgroundColor = MiuixTheme.colorScheme.background,
             tint = HazeTint(MiuixTheme.colorScheme.background.copy(0.67f))
         )
@@ -117,10 +115,12 @@ fun App() {
             topBar = {
                 TopAppBar(
                     color = Color.Transparent,
-                    modifier = Modifier.hazeEffect(
-                        state = hazeState,
-                        style = hazeStyleTopAppBar
-                    ),
+                    modifier = Modifier
+                        .hazeEffect(hazeState) {
+                            style = hazeStyleTopAppBar
+                            blurRadius = 25.dp
+                            noiseFactor = 0f
+                        },
                     title = stringResource(R.string.app_name),
                     navigationIcon = { AboutDialog() },
                     scrollBehavior = currentScrollBehavior
@@ -129,10 +129,11 @@ fun App() {
             bottomBar = {
                 NavigationBar(
                     color = Color.Transparent,
-                    modifier = Modifier.hazeEffect(
-                        state = hazeState,
+                    modifier = Modifier.hazeEffect(hazeState) {
                         style = hazeStyleNavigationBar
-                    ),
+                        blurRadius = 25.dp
+                        noiseFactor = 0f
+                    },
                     items = navigationItems,
                     selected = targetPage,
                     onClick = { index ->
