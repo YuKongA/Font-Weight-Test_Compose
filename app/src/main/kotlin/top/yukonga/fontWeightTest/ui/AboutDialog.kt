@@ -50,7 +50,7 @@ fun AboutDialog() {
                 interactionSource = null,
                 onClick = {
                     showDialog.value = true
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
                 }
             ),
         color = Color.Transparent
@@ -114,7 +114,7 @@ fun AboutDialog() {
                         modifier = Modifier.clickable(
                             onClick = {
                                 uriHandler.openUri("https://github.com/YuKongA/Font-Weight-Test_Compose")
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
                             }
                         )
                     )
@@ -133,7 +133,7 @@ fun AboutDialog() {
                         modifier = Modifier.clickable(
                             onClick = {
                                 uriHandler.openUri("https://t.me/YuKongA13579")
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
                             },
                         )
                     )

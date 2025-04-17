@@ -1,11 +1,11 @@
 [versions]
-androidGradlePlugin = "8.9.0"
-androidx-coreKtx = "1.15.0"
+androidGradlePlugin = "8.9.1"
+androidx-coreKtx = "1.16.0"
 androidx-activity-compose = "1.10.1"
 androidx-compose-foundation = "1.7.8"
-haze = "1.5.0"
-kotlin = "2.1.10"
-miuix = "0.3.6"
+haze = "1.5.2"
+kotlin = "2.1.20"
+miuix = "0.4.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-coreKtx" }

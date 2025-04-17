@@ -1,15 +1,13 @@
 package top.yukonga.fontWeightTest
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,8 +21,6 @@ import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import top.yukonga.fontWeightTest.ui.AboutDialog
 import top.yukonga.fontWeightTest.ui.HomeView
@@ -32,41 +28,23 @@ import top.yukonga.fontWeightTest.ui.MonospaceView
 import top.yukonga.fontWeightTest.ui.SansSerifView
 import top.yukonga.fontWeightTest.ui.SerifView
 import top.yukonga.fontWeightTest.ui.theme.AppTheme
-import top.yukonga.miuix.kmp.basic.HorizontalPager
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.NavigationBar
 import top.yukonga.miuix.kmp.basic.NavigationItem
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.basic.rememberTopAppBarState
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @OptIn(FlowPreview::class)
 @Composable
 fun App() {
     AppTheme {
-        val topAppBarScrollBehavior0 = MiuixScrollBehavior(rememberTopAppBarState())
-        val topAppBarScrollBehavior1 = MiuixScrollBehavior(rememberTopAppBarState())
-        val topAppBarScrollBehavior2 = MiuixScrollBehavior(rememberTopAppBarState())
-        val topAppBarScrollBehavior3 = MiuixScrollBehavior(rememberTopAppBarState())
-
-        val topAppBarScrollBehaviorList = listOf(
-            topAppBarScrollBehavior0,
-            topAppBarScrollBehavior1,
-            topAppBarScrollBehavior2,
-            topAppBarScrollBehavior3
-        )
-
-        val pagerState = rememberPagerState(pageCount = { 4 })
-        var targetPage by remember { mutableIntStateOf(pagerState.currentPage) }
         val coroutineScope = rememberCoroutineScope()
 
-        val currentScrollBehavior = when (pagerState.currentPage) {
-            0 -> topAppBarScrollBehaviorList[0]
-            1 -> topAppBarScrollBehaviorList[1]
-            2 -> topAppBarScrollBehaviorList[2]
-            else -> topAppBarScrollBehaviorList[3]
-        }
+        val topAppBarScrollBehaviorList = List(4) { MiuixScrollBehavior() }
+        val pagerState = rememberPagerState(pageCount = { 4 })
+        val selectedPage = remember { derivedStateOf { pagerState.currentPage } }.value
+        val currentScrollBehavior = topAppBarScrollBehaviorList[selectedPage]
 
         val navigationItems = listOf(
             NavigationItem(
@@ -86,12 +64,6 @@ fun App() {
                 ImageVector.vectorResource(R.drawable.monospace)
             ),
         )
-
-        LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.currentPage }.debounce(150).collectLatest { page ->
-                targetPage = page
-            }
-        }
 
         val hazeState = remember { HazeState() }
 
@@ -135,9 +107,8 @@ fun App() {
                         noiseFactor = 0f
                     },
                     items = navigationItems,
-                    selected = targetPage,
+                    selected = selectedPage,
                     onClick = { index ->
-                        targetPage = index
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
                         }
@@ -149,13 +120,15 @@ fun App() {
                 modifier = Modifier
                     .fillMaxSize()
                     .hazeSource(state = hazeState),
-                pagerState = pagerState,
+                state = pagerState,
                 pageContent = { page ->
-                    when (page) {
-                        0 -> HomeView(topAppBarScrollBehaviorList[0], padding)
-                        1 -> SansSerifView(topAppBarScrollBehaviorList[1], padding)
-                        2 -> SerifView(topAppBarScrollBehaviorList[2], padding)
-                        3 -> MonospaceView(topAppBarScrollBehaviorList[3], padding)
+                    key(page) {
+                        when (page) {
+                            0 -> HomeView(topAppBarScrollBehaviorList[0], padding)
+                            1 -> SansSerifView(topAppBarScrollBehaviorList[1], padding)
+                            2 -> SerifView(topAppBarScrollBehaviorList[2], padding)
+                            3 -> MonospaceView(topAppBarScrollBehaviorList[3], padding)
+                        }
                     }
                 }
             )

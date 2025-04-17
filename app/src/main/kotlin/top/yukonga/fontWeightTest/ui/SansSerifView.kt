@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -14,9 +15,9 @@ import top.yukonga.fontWeightTest.R
 import top.yukonga.fontWeightTest.ui.components.CardView
 import top.yukonga.fontWeightTest.ui.components.OtherTestView
 import top.yukonga.fontWeightTest.ui.components.WeightTextView
-import top.yukonga.miuix.kmp.basic.LazyColumn
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 import top.yukonga.miuix.kmp.basic.SmallTitle
+import top.yukonga.miuix.kmp.utils.overScrollVertical
 
 @Composable
 fun SansSerifView(
@@ -25,6 +26,7 @@ fun SansSerifView(
 ) {
     LazyColumn(
         modifier = Modifier
+            .overScrollVertical()
             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
     ) {
         item {

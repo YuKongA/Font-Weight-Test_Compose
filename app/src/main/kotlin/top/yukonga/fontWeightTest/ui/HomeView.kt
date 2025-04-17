@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,13 +39,13 @@ import top.yukonga.fontWeightTest.R
 import top.yukonga.fontWeightTest.ui.components.CardView
 import top.yukonga.fontWeightTest.utils.fontWeightList
 import top.yukonga.fontWeightTest.utils.miSansList
-import top.yukonga.miuix.kmp.basic.LazyColumn
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 import top.yukonga.miuix.kmp.basic.Slider
 import top.yukonga.miuix.kmp.basic.SmallTitle
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.overScrollVertical
 
 @Composable
 fun HomeView(
@@ -53,6 +54,7 @@ fun HomeView(
 ) {
     LazyColumn(
         modifier = Modifier
+            .overScrollVertical()
             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
     ) {
         item {
