@@ -13,14 +13,14 @@ val pkgName = "top.yukonga.fontWeightTest"
 @Suppress("UnstableApiUsage")
 android {
     namespace = pkgName
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = pkgName
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = getVersionCode()
-        versionName = "1.5.0"
+        versionName = "1.5.1"
     }
     val properties = Properties()
     runCatching { properties.load(project.rootProject.file("local.properties").inputStream()) }
