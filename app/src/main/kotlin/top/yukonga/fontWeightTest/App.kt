@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,11 +43,14 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 fun App() {
     AppTheme {
         val coroutineScope = rememberCoroutineScope()
-
         val topAppBarScrollBehaviorList = List(4) { MiuixScrollBehavior() }
         val pagerState = rememberPagerState(pageCount = { 4 })
-        val selectedPage = remember { derivedStateOf { pagerState.currentPage } }.value
+        var selectedPage by remember { mutableIntStateOf(pagerState.currentPage) }
         val currentScrollBehavior = topAppBarScrollBehaviorList[selectedPage]
+
+        LaunchedEffect(pagerState.settledPage) {
+            if (selectedPage != pagerState.settledPage) selectedPage = pagerState.settledPage
+        }
 
         val navigationItems = listOf(
             NavigationItem(
@@ -109,6 +115,7 @@ fun App() {
                     items = navigationItems,
                     selected = selectedPage,
                     onClick = { index ->
+                        selectedPage = index
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
                         }
