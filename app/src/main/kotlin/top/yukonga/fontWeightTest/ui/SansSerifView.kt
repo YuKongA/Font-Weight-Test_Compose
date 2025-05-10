@@ -35,14 +35,14 @@ fun SansSerifView(
                 WeightTextView()
             }
             SmallTitle(
-                modifier = Modifier.padding(top = 12.dp),
+                modifier = Modifier.padding(top = 6.dp),
                 text = stringResource(R.string.italic_font),
             )
             CardView {
                 WeightTextView(fontStyle = FontStyle.Italic)
             }
             SmallTitle(
-                modifier = Modifier.padding(top = 12.dp),
+                modifier = Modifier.padding(top = 6.dp),
                 text = stringResource(R.string.more_examples),
             )
         }

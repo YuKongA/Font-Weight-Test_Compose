@@ -10,8 +10,11 @@
     <string name="monospace">等宽</string>
     <string name="comparison_display">字重对比显示</string>
     <string name="variable_font">可变字体测试</string>
-    <string name="custom_text">自定义文本</string>
+    <string name="custom_text">文本</string>
     <string name="device_font">设备字体</string>
     <string name="italic_font">倾斜字体</string>
     <string name="more_examples">更多示例</string>
+    <string name="font_weight">字重</string>
+    <string name="font_size">字号</string>
+    <string name="about">关于</string>
 </resources>

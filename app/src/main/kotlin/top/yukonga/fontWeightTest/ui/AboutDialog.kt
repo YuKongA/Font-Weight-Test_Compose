@@ -10,14 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -31,32 +29,28 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import top.yukonga.fontWeightTest.BuildConfig
 import top.yukonga.fontWeightTest.R
-import top.yukonga.miuix.kmp.basic.Surface
+import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.dismissDialog
+import top.yukonga.miuix.kmp.utils.SmoothRoundedCornerShape
 
 @Composable
 fun AboutDialog() {
     val showDialog = remember { mutableStateOf(false) }
     val hapticFeedback = LocalHapticFeedback.current
 
-    Surface(
+    IconButton(
         modifier = Modifier
-            .padding(start = 26.dp)
-            .clickable(
-                indication = null,
-                interactionSource = null,
-                onClick = {
-                    showDialog.value = true
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                }
-            ),
-        color = Color.Transparent
+            .padding(start = 18.dp),
+        onClick = {
+            showDialog.value = true
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
+        },
+        holdDownState = showDialog.value
     ) {
         Image(
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(30.dp),
             painter = painterResource(R.drawable.icon),
             contentDescription = null,
             colorFilter = ColorFilter.tint(MiuixTheme.colorScheme.onSurface)
@@ -65,8 +59,10 @@ fun AboutDialog() {
 
     SuperDialog(
         show = showDialog,
-        title = "About",
-        onDismissRequest = { dismissDialog(showDialog) },
+        title = stringResource(R.string.about),
+        onDismissRequest = {
+            showDialog.value = false
+        },
         content = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -76,7 +72,7 @@ fun AboutDialog() {
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(RoundedCornerShape(50.dp))
+                        .clip(SmoothRoundedCornerShape(12.dp))
                         .background(MiuixTheme.colorScheme.primary)
                 ) {
                     Image(
@@ -109,7 +105,10 @@ fun AboutDialog() {
                     Text(
                         text = AnnotatedString(
                             text = "GitHub",
-                            spanStyle = SpanStyle(textDecoration = TextDecoration.Underline, color = MiuixTheme.colorScheme.primary)
+                            spanStyle = SpanStyle(
+                                textDecoration = TextDecoration.Underline,
+                                color = MiuixTheme.colorScheme.primary
+                            )
                         ),
                         modifier = Modifier.clickable(
                             onClick = {
@@ -128,7 +127,10 @@ fun AboutDialog() {
                     Text(
                         text = AnnotatedString(
                             text = "Telegram",
-                            spanStyle = SpanStyle(textDecoration = TextDecoration.Underline, color = MiuixTheme.colorScheme.primary)
+                            spanStyle = SpanStyle(
+                                textDecoration = TextDecoration.Underline,
+                                color = MiuixTheme.colorScheme.primary
+                            )
                         ),
                         modifier = Modifier.clickable(
                             onClick = {

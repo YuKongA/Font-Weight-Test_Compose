@@ -14,4 +14,7 @@
     <string name="device_font">Device font</string>
     <string name="italic_font">Italic font</string>
     <string name="more_examples">More Examples</string>
+    <string name="font_weight">Font Weight</string>
+    <string name="font_size">Font Size</string>
+    <string name="about">About</string>
 </resources>

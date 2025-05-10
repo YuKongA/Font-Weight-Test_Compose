@@ -128,6 +128,7 @@ fun App() {
                     .fillMaxSize()
                     .hazeSource(state = hazeState),
                 state = pagerState,
+                userScrollEnabled = false,
                 pageContent = { page ->
                     key(page) {
                         when (page) {

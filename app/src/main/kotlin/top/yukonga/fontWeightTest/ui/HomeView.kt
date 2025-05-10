@@ -1,38 +1,30 @@
 package top.yukonga.fontWeightTest.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.yukonga.fontWeightTest.R
@@ -44,7 +36,6 @@ import top.yukonga.miuix.kmp.basic.Slider
 import top.yukonga.miuix.kmp.basic.SmallTitle
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 
 @Composable
@@ -52,10 +43,17 @@ fun HomeView(
     topAppBarScrollBehavior: ScrollBehavior,
     padding: PaddingValues
 ) {
+    val focusManager = LocalFocusManager.current
     LazyColumn(
         modifier = Modifier
             .overScrollVertical()
             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
+            .clickable(
+                indication = null,
+                interactionSource = null,
+            ) {
+                focusManager.clearFocus()
+            }
     ) {
         item {
             Spacer(Modifier.height(12.dp + padding.calculateTopPadding()))
@@ -72,14 +70,14 @@ fun HomeView(
 fun PortraitContent() {
     SmallTitle(
         text = stringResource(R.string.comparison_display),
-        modifier = Modifier.padding(top = 12.dp)
+        modifier = Modifier.padding(top = 6.dp)
     )
     CardView {
         ComparisonDisplay()
     }
     SmallTitle(
         text = stringResource(R.string.variable_font),
-        modifier = Modifier.padding(top = 12.dp)
+        modifier = Modifier.padding(top = 6.dp)
     )
     CardView {
         SliderTestView()
@@ -166,77 +164,87 @@ fun MoreTestText(text: String) {
 
 @Composable
 fun SliderTestView() {
-    val customText = remember { mutableStateOf("") }
-    val fontWeightValue = remember { mutableFloatStateOf(400f) }
-    val inputText = remember { mutableStateOf(fontWeightValue.floatValue.toInt().toString()) }
-    val textWidthDp =
-        with(LocalDensity.current) { rememberTextMeasurer().measure(text = "1000", style = MiuixTheme.textStyles.main).size.width.toDp() }
+    var customText by remember { mutableStateOf("".ifEmpty { "永 の A 6" }) }
+    var fontSizeValue by remember { mutableIntStateOf(24) }
+    var fontSizeText by remember { mutableStateOf(fontSizeValue.toString()) }
+    var fontWeightValue by remember { mutableIntStateOf(400) }
+    var fontWeightText by remember { mutableStateOf(fontWeightValue.toString()) }
     val focusManager = LocalFocusManager.current
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = customText.value.ifEmpty { "永 の A 6" },
-            fontSize = 24.sp,
-            fontWeight = FontWeight(fontWeightValue.floatValue.toInt())
-        )
-        Row {
-            Text(
-                text = "Font Weight: "
-            )
-            BasicTextField(
-                value = inputText.value,
+        Column(
+            modifier = Modifier.weight(0.5f),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            TextField(
+                value = fontWeightText,
                 onValueChange = { newValue ->
-                    val intValue = newValue.toIntOrNull()
-                    if (intValue != null && intValue in 1..999) {
-                        fontWeightValue.floatValue = intValue.toFloat()
-                        inputText.value = newValue
-                    } else if (newValue.isEmpty()) {
-                        inputText.value = "1"
+                    if (newValue.isEmpty()) {
+                        fontWeightValue = 1
+                        fontWeightText = ""
+                    } else if (newValue.all { it.isDigit() }) {
+                        fontWeightValue = newValue.toInt().coerceIn(1, 1000)
+                        fontWeightText = fontWeightValue.toString()
                     }
                 },
-                modifier = Modifier
-                    .width(textWidthDp),
-                textStyle = TextStyle(
-                    textAlign = TextAlign.Center,
-                    color = MiuixTheme.colorScheme.onBackground
-                ),
+                label = stringResource(R.string.font_weight),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                decorationBox = {
-                    Column {
-                        it()
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(0.8.dp)
-                                .background(if (isSystemInDarkTheme()) Color.DarkGray else Color.LightGray)
-                        )
-                    }
-                }
+            )
+            Slider(
+                progress = fontWeightValue.toFloat(),
+                onProgressChange = { newValue ->
+                    fontWeightValue = newValue.toInt()
+                    fontWeightText = newValue.toInt().toString()
+                },
+                minValue = 1f,
+                maxValue = 1000f
             )
         }
-        Slider(
-            modifier = Modifier.padding(top = 6.dp),
-            progress = fontWeightValue.floatValue,
-            onProgressChange = { newValue ->
-                fontWeightValue.floatValue = newValue
-                inputText.value = newValue.toInt().toString()
-            },
-            minValue = 1f,
-            maxValue = 999f
-        )
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            cornerRadius = 14.dp,
-            value = customText.value,
-            onValueChange = { customText.value = it },
-            label = stringResource(R.string.custom_text),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-        )
+        Column(
+            modifier = Modifier.weight(0.5f),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            TextField(
+                value = fontSizeText,
+                onValueChange = { newValue ->
+                    if (newValue.isEmpty()) {
+                        fontSizeValue = 6
+                        fontSizeText = ""
+                    } else if (newValue.all { it.isDigit() }) {
+                        fontSizeValue = newValue.toInt().coerceIn(6, 96)
+                        fontSizeText = fontSizeValue.toString()
+                    }
+                },
+                label = stringResource(R.string.font_size),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            )
+            Slider(
+                progress = fontSizeValue.toFloat(),
+                onProgressChange = { newValue ->
+                    fontSizeValue = newValue.toInt()
+                    fontSizeText = newValue.toInt().toString()
+                },
+                minValue = 6f,
+                maxValue = 96f
+            )
+        }
     }
+    TextField(
+        modifier = Modifier.padding(top = 12.dp),
+        value = customText,
+        onValueChange = { customText = it },
+        label = stringResource(R.string.custom_text),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+    )
+    Text(
+        modifier = Modifier.padding(top = 12.dp),
+        text = customText.ifEmpty { "永 の A 6" },
+        fontSize = fontSizeValue.coerceIn(6, 96).sp,
+        fontWeight = FontWeight(fontWeightValue.coerceIn(1, 1000)),
+    )
 }
