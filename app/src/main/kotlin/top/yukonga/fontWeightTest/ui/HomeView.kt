@@ -190,8 +190,16 @@ fun SliderTestView() {
                     }
                 },
                 label = stringResource(R.string.font_weight),
+                useLabelAsPlaceholder = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                trailingIcon = {
+                    Text(
+                        text = stringResource(R.string.font_weight),
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
             )
             Slider(
                 progress = fontWeightValue.toFloat(),
@@ -219,8 +227,16 @@ fun SliderTestView() {
                     }
                 },
                 label = stringResource(R.string.font_size),
+                useLabelAsPlaceholder = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                trailingIcon = {
+                    Text(
+                        text = stringResource(R.string.font_size),
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
             )
             Slider(
                 progress = fontSizeValue.toFloat(),
@@ -234,12 +250,31 @@ fun SliderTestView() {
         }
     }
     TextField(
-        modifier = Modifier.padding(top = 12.dp),
         value = customText,
         onValueChange = { customText = it },
         label = stringResource(R.string.custom_text),
+        useLabelAsPlaceholder = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        modifier = Modifier.padding(top = 12.dp),
+        trailingIcon = {
+            Text(
+                text = if (customText.isEmpty()) stringResource(R.string.custom_text) else stringResource(R.string.clear_text),
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .then(
+                        if (customText.isNotEmpty())
+                            Modifier.clickable(
+                                indication = null,
+                                interactionSource = null,
+                            ) {
+                                customText = ""
+                            }
+                        else Modifier
+                    )
+                    .padding(horizontal = 16.dp)
+            )
+        }
     )
     Text(
         modifier = Modifier.padding(top = 12.dp),

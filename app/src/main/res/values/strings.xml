@@ -11,6 +11,7 @@
     <string name="comparison_display">Font weight display</string>
     <string name="variable_font">Variable font test</string>
     <string name="custom_text">Custom text</string>
+    <string name="clear_text">Clear</string>
     <string name="device_font">Device font</string>
     <string name="italic_font">Italic font</string>
     <string name="more_examples">More Examples</string>

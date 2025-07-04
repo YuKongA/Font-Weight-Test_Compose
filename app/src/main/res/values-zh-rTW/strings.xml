@@ -11,6 +11,7 @@
     <string name="comparison_display">字重對比顯示</string>
     <string name="variable_font">可變字體測試</string>
     <string name="custom_text">文本</string>
+    <string name="clear_text">清除</string>
     <string name="device_font">設備字體</string>
     <string name="italic_font">傾斜字體</string>
     <string name="more_examples">更多範例</string>
