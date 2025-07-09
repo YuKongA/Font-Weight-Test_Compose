@@ -39,4 +39,4 @@ android {
 }
 
 rootProject.name = "FontWeightTest"
-include(":app")
+include(":composeApp")
