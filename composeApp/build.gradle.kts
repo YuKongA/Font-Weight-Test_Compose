@@ -1,8 +1,14 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import com.android.build.gradle.internal.tasks.factory.dependsOn
+import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import org.jetbrains.compose.desktop.application.tasks.AbstractNativeMacApplicationPackageAppDirTask
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.util.Properties
 
 plugins {
@@ -17,18 +23,28 @@ val pkgName = "top.yukonga.fontWeightTest"
 val verName = "1.6.0"
 val verCode = getVersionCode()
 val generatedSrcDir = layout.buildDirectory.dir("generated").get().asFile.resolve("fontWeightTest")
-val xcf = XCFramework(appName + "Framework")
 kotlin {
     androidTarget()
 
     jvm("desktop")
 
-    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64(),
+    ).forEach {
         it.binaries.framework {
-            baseName = appName + "Framework"
+            baseName = "shared"
             isStatic = true
-            freeCompilerArgs += "-Xbinary=bundleId=$pkgName.framework"
-            xcf.add(this)
+        }
+    }
+
+    listOf(
+        macosX64(),
+        macosArm64(),
+    ).forEach {
+        it.binaries.executable {
+            entryPoint = "main"
         }
     }
 
@@ -111,20 +127,16 @@ android {
 compose.desktop {
     application {
         mainClass = "MainKt"
-
         buildTypes.release.proguard {
             optimize = false
             configurationFiles.from("proguard-rules-jvm.pro")
         }
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-
             packageName = appName
             packageVersion = verName
             description = "Font Weight Test"
             copyright = "Copyright © 2024-2025 YuKongA"
-
             linux {
                 //iconFile = file("src/desktopMain/resources/linux/Icon.png")
             }
@@ -137,6 +149,20 @@ compose.desktop {
                 dirChooser = true
                 perUserInstall = true
                 //iconFile = file("src/desktopMain/resources/windows/Icon.ico")
+            }
+        }
+        nativeApplication {
+            targets(kotlin.targets.getByName("macosArm64"), kotlin.targets.getByName("macosX64"))
+            distributions {
+                targetFormats(TargetFormat.Dmg)
+                packageName = appName
+                packageVersion = verName
+                description = "Font Weight Test"
+                copyright = "Copyright © 2024-2025 YuKongA"
+                macOS {
+                    bundleID = pkgName
+                    //iconFile = file("src/macosMain/resources/FontWeightTest.icns")
+                }
             }
         }
     }
@@ -175,4 +201,54 @@ val generateVersionInfo by tasks.registering {
 
 tasks.named("generateComposeResClass").configure {
     dependsOn(generateVersionInfo)
+}
+
+afterEvaluate {
+    project.extensions.getByType<KotlinMultiplatformExtension>().targets
+        .withType<KotlinNativeTarget>()
+        .filter { it.konanTarget == KonanTarget.MACOS_ARM64 || it.konanTarget == KonanTarget.MACOS_X64 }
+        .forEach { target ->
+            val targetName = target.targetName.uppercaseFirstChar()
+            val buildTypes = mapOf(
+                NativeBuildType.RELEASE to target.binaries.getExecutable(NativeBuildType.RELEASE),
+                NativeBuildType.DEBUG to target.binaries.getExecutable(NativeBuildType.DEBUG)
+            )
+            buildTypes.forEach { (buildType, executable) ->
+                val buildTypeName = buildType.name.lowercase().uppercaseFirstChar()
+                target.binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.Executable>()
+                    .filter { it.buildType == buildType }
+                    .forEach {
+                        val taskName = "copy${buildTypeName}ComposeResourcesFor${targetName}"
+                        val copyTask = tasks.register<Copy>(taskName) {
+                            from({
+                                (executable.compilation.associatedCompilations + executable.compilation).flatMap { compilation ->
+                                    compilation.allKotlinSourceSets.map { it -> it.resources }
+                                }
+                            })
+                            into(executable.outputDirectory.resolve("compose-resources"))
+                            exclude("*.icns")
+                        }
+                        it.linkTaskProvider.dependsOn(copyTask)
+                    }
+            }
+        }
+}
+
+tasks.withType<AbstractNativeMacApplicationPackageAppDirTask>().configureEach {
+    doLast {
+        val packageName = packageName.get()
+        val destinationDir = outputs.files.singleFile
+        val appDir = destinationDir.resolve("$packageName.app")
+        val resourcesDir = appDir.resolve("Contents/Resources")
+        val currentMacosTarget = kotlin.targets.withType<KotlinNativeTarget>()
+            .find { it.konanTarget == KonanTarget.MACOS_ARM64 || it.konanTarget == KonanTarget.MACOS_X64 }?.targetName
+        val composeResourcesDir = project.rootDir
+            .resolve("composeApp/build/bin/$currentMacosTarget/releaseExecutable/compose-resources")
+        if (composeResourcesDir.exists()) {
+            project.copy {
+                from(composeResourcesDir)
+                into(resourcesDir.resolve("compose-resources"))
+            }
+        }
+    }
 }

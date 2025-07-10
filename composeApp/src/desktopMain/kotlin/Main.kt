@@ -24,6 +24,7 @@ import theme.LinuxThemeManager
 import theme.MacOSThemeManager
 import theme.WindowsThemeManager
 import top.yukonga.fontWeightTest.App
+import java.awt.Dimension
 import javax.swing.SwingUtilities
 
 fun main() = application {
@@ -37,6 +38,7 @@ fun main() = application {
         title = stringResource(Res.string.app_name),
         icon = painterResource(Res.drawable.icon),
     ) {
+        window.minimumSize = Dimension(300, 600)
         when {
             isWindows() -> {
                 var isDarkTheme by remember { mutableStateOf(WindowsThemeManager.isWindowsDarkTheme()) }

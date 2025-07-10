@@ -24,6 +24,12 @@ jobs:
             artifact-path: composeApp/build/compose/binaries/main-release/app/FontWeightTest
             artifact-name: FontWeightTest-windows-x64-exe
             jdk-distribution: jetbrains
+          - os: macos-latest
+            platform: macos arm64
+            build-command: ./gradlew packageDmgNativeReleaseMacosArm64
+            artifact-path: composeApp/build/compose/binaries/main/native-macosArm64-release-dmg
+            artifact-name: FontWeightTest-darwin-arm64-dmg
+            jdk-distribution: zulu
           - os: ubuntu-latest
             platform: linux x64
             platformEx: android aarch64

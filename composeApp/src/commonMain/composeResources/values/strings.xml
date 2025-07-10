@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Font Weight Test</string>
+    <string name="app_name">FontWeightTest</string>
     <string name="view_source">View Source:</string>
     <string name="join_group">Join Group:</string>
     <string name="opensource_info">Copyright © 2024 YuKongA</string>
