@@ -138,17 +138,17 @@ compose.desktop {
             description = "Font Weight Test"
             copyright = "Copyright © 2024-2025 YuKongA"
             linux {
-                //iconFile = file("src/desktopMain/resources/linux/Icon.png")
+                iconFile = file("src/desktopMain/resources/linux/Icon.png")
             }
             macOS {
                 bundleID = pkgName
                 jvmArgs("-Dapple.awt.application.appearance=system")
-                //iconFile = file("src/desktopMain/resources/macos/Icon.icns")
+                iconFile = file("src/desktopMain/resources/macos/Icon.icns")
             }
             windows {
                 dirChooser = true
                 perUserInstall = true
-                //iconFile = file("src/desktopMain/resources/windows/Icon.ico")
+                iconFile = file("src/desktopMain/resources/windows/Icon.ico")
             }
         }
         nativeApplication {
@@ -161,7 +161,7 @@ compose.desktop {
                 copyright = "Copyright © 2024-2025 YuKongA"
                 macOS {
                     bundleID = pkgName
-                    //iconFile = file("src/macosMain/resources/FontWeightTest.icns")
+                    iconFile = file("src/macosMain/resources/FontWeightTest.icns")
                 }
             }
         }
