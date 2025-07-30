@@ -1,22 +1,14 @@
 [versions]
-android-gradle-plugin = "8.11.0"
+android-gradle-plugin = "8.11.1"
 androidx-activity-compose = "1.10.1"
-androidx-coreKtx = "1.16.0"
-androidx-compose-foundation = "1.8.3"
 compose-plugin = "1.8.2"
-haze = "1.6.7"
+haze = "1.6.9"
 jna = "5.17.0"
 kotlin = "2.2.0"
-miuix = "0.4.7"
+miuix = "0.4.9"
 
 [libraries]
-androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-coreKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
-androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "androidx-compose-foundation" }
-androidx-ui = { group = "androidx.compose.ui", name = "ui" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }

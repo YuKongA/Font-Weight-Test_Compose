@@ -16,7 +16,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.lerp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
@@ -85,16 +84,6 @@ fun App(
 
         val hazeState = remember { HazeState() }
 
-        val hazeStyleTopAppBar = HazeStyle(
-            backgroundColor = MiuixTheme.colorScheme.background,
-            tint = HazeTint(
-                MiuixTheme.colorScheme.background.copy(
-                    if (currentScrollBehavior.state.collapsedFraction <= 0f) 1f
-                    else lerp(1f, 0.67f, (currentScrollBehavior.state.collapsedFraction))
-                )
-            )
-        )
-
         val hazeStyleNavigationBar = HazeStyle(
             backgroundColor = MiuixTheme.colorScheme.background,
             tint = HazeTint(MiuixTheme.colorScheme.background.copy(0.67f))
@@ -106,26 +95,12 @@ fun App(
                 BoxWithConstraints {
                     if (maxWidth < 768.dp) {
                         TopAppBar(
-                            color = Color.Transparent,
-                            modifier = Modifier
-                                .hazeEffect(hazeState) {
-                                    style = hazeStyleTopAppBar
-                                    blurRadius = 25.dp
-                                    noiseFactor = 0f
-                                },
                             title = stringResource(Res.string.app_name),
                             navigationIcon = { AboutDialog() },
                             scrollBehavior = currentScrollBehavior
                         )
                     } else {
                         SmallTopAppBar(
-                            color = Color.Transparent,
-                            modifier = Modifier
-                                .hazeEffect(hazeState) {
-                                    style = hazeStyleTopAppBar
-                                    blurRadius = 25.dp
-                                    noiseFactor = 0f
-                                },
                             title = stringResource(Res.string.app_name),
                             navigationIcon = { AboutDialog() },
                             scrollBehavior = currentScrollBehavior
