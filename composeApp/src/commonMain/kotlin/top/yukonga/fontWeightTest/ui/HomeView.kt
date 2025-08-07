@@ -11,15 +11,20 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -39,8 +44,10 @@ import fontweighttest.composeapp.generated.resources.variable_font
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.fontWeightTest.ui.components.CardView
+import top.yukonga.fontWeightTest.utils.fontWeightDescriptions
 import top.yukonga.fontWeightTest.utils.fontWeightList
 import top.yukonga.fontWeightTest.utils.miSansList
+import top.yukonga.fontWeightTest.utils.testCharacters
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 import top.yukonga.miuix.kmp.basic.Slider
 import top.yukonga.miuix.kmp.basic.SmallTitle
@@ -49,6 +56,17 @@ import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 
+@Stable
+data class FontDisplayState(
+    val customText: String = "",
+    val fontSizeValue: Int = 24,
+    val fontWeightValue: Int = 400
+) {
+    val effectiveFontSize = fontSizeValue.coerceIn(6, 96)
+    val effectiveFontWeight = FontWeight(fontWeightValue.coerceIn(1, 1000))
+    val displayText = customText.ifEmpty { "永 の A 6" }
+}
+
 @Composable
 fun HomeView(
     topAppBarScrollBehavior: ScrollBehavior,
@@ -56,6 +74,7 @@ fun HomeView(
 ) {
     val focusManager = LocalFocusManager.current
     val layoutDirection = LocalLayoutDirection.current
+
     LazyColumn(
         modifier = Modifier
             .scrollEndHaptic()
@@ -73,30 +92,41 @@ fun HomeView(
             bottom = padding.calculateBottomPadding() + 12.dp
         ),
     ) {
-        item {
-            CardView {
-                AllWeightText()
-            }
-            PortraitContent()
-        }
+        homeContent()
     }
 }
 
-@Composable
-fun PortraitContent() {
-    SmallTitle(
-        text = stringResource(Res.string.comparison_display),
-        modifier = Modifier.padding(top = 6.dp)
-    )
-    CardView {
-        ComparisonDisplay()
+private fun LazyListScope.homeContent() {
+    item(key = "all_weights") {
+        CardView {
+            AllWeightText()
+        }
     }
-    SmallTitle(
-        text = stringResource(Res.string.variable_font),
-        modifier = Modifier.padding(top = 6.dp)
-    )
-    CardView {
-        SliderTestView()
+
+    item(key = "comparison_title") {
+        SmallTitle(
+            text = stringResource(Res.string.comparison_display),
+            modifier = Modifier.padding(top = 6.dp)
+        )
+    }
+
+    item(key = "comparison_display") {
+        CardView {
+            ComparisonDisplay()
+        }
+    }
+
+    item(key = "variable_font_title") {
+        SmallTitle(
+            text = stringResource(Res.string.variable_font),
+            modifier = Modifier.padding(top = 6.dp)
+        )
+    }
+
+    item(key = "variable_font") {
+        CardView {
+            SliderTestView()
+        }
     }
 }
 
@@ -112,18 +142,8 @@ fun AllWeightText() {
     Column {
         fontWeightList.forEachIndexed { index, fontWeight ->
             WeightText(
-                "${(index + 1) * 100} - " + when (index) {
-                    0 -> "淡体 Thin (Hairline)"
-                    1 -> "特细 ExtraLight (UltraLight)"
-                    2 -> "细体 Light"
-                    3 -> "标准 Normal (Regular)"
-                    4 -> "适中 Medium"
-                    5 -> "次粗 SemiBold (DemiBold)"
-                    6 -> "粗体 Bold"
-                    7 -> "特粗 ExtraBold (UltraBold)"
-                    8 -> "浓体 Black (Heavy)"
-                    else -> ""
-                }, fontWeight
+                "${(index + 1) * 100} - ${fontWeightDescriptions[index]}",
+                fontWeight
             )
         }
     }
@@ -142,7 +162,7 @@ fun WeightText(description: String, fontWeight: FontWeight) {
 fun MiSansTestView(text: String) {
     Column {
         Text(text = text)
-        listOf("永", "の", "A", "6").forEach { MiSansTest(it) }
+        testCharacters.forEach { MiSansTest(it) }
     }
 }
 
@@ -163,7 +183,7 @@ fun MiSansTest(text: String) {
 fun DeviceFontTestView(text: String) {
     Column {
         Text(text = text)
-        listOf("永", "の", "A", "6").forEach { MoreTestText(it) }
+        testCharacters.forEach { MoreTestText(it) }
     }
 }
 
@@ -186,16 +206,27 @@ fun SliderTestView() {
     var fontSizeText by rememberSaveable { mutableStateOf(fontSizeValue.toString()) }
     var fontWeightValue by rememberSaveable { mutableIntStateOf(400) }
     var fontWeightText by rememberSaveable { mutableStateOf(fontWeightValue.toString()) }
+
+    val fontDisplayState by remember {
+        derivedStateOf {
+            FontDisplayState(
+                customText = customText,
+                fontSizeValue = fontSizeValue,
+                fontWeightValue = fontWeightValue
+            )
+        }
+    }
+
     val focusManager = LocalFocusManager.current
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Column(
-            modifier = Modifier.weight(0.5f),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            TextField(
+            FontWeightControl(
+                modifier = Modifier.weight(0.5f),
                 value = fontWeightText,
                 onValueChange = { newValue ->
                     if (newValue.isEmpty()) {
@@ -206,33 +237,16 @@ fun SliderTestView() {
                         fontWeightText = fontWeightValue.toString()
                     }
                 },
-                label = stringResource(Res.string.font_weight),
-                useLabelAsPlaceholder = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                trailingIcon = {
-                    Text(
-                        text = stringResource(Res.string.font_weight),
-                        fontSize = 13.sp,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                }
-            )
-            Slider(
-                progress = fontWeightValue.toFloat(),
-                onProgressChange = { newValue ->
+                sliderValue = fontWeightValue.toFloat(),
+                onSliderChange = { newValue ->
                     fontWeightValue = newValue.toInt()
                     fontWeightText = newValue.toInt().toString()
                 },
-                minValue = 1f,
-                maxValue = 1000f
+                focusManager = focusManager
             )
-        }
-        Column(
-            modifier = Modifier.weight(0.5f),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            TextField(
+
+            FontSizeControl(
+                modifier = Modifier.weight(0.5f),
                 value = fontSizeText,
                 onValueChange = { newValue ->
                     if (newValue.isEmpty()) {
@@ -243,61 +257,135 @@ fun SliderTestView() {
                         fontSizeText = fontSizeValue.toString()
                     }
                 },
-                label = stringResource(Res.string.font_size),
-                useLabelAsPlaceholder = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                trailingIcon = {
-                    Text(
-                        text = stringResource(Res.string.font_size),
-                        fontSize = 13.sp,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                }
-            )
-            Slider(
-                progress = fontSizeValue.toFloat(),
-                onProgressChange = { newValue ->
+                sliderValue = fontSizeValue.toFloat(),
+                onSliderChange = { newValue ->
                     fontSizeValue = newValue.toInt()
                     fontSizeText = newValue.toInt().toString()
                 },
-                minValue = 6f,
-                maxValue = 96f
+                focusManager = focusManager
             )
         }
+
+        CustomTextInput(
+            value = customText,
+            onValueChange = { customText = it },
+            focusManager = focusManager
+        )
+
+        Text(
+            modifier = Modifier.padding(top = 12.dp),
+            text = fontDisplayState.displayText,
+            fontSize = fontDisplayState.effectiveFontSize.sp,
+            fontWeight = fontDisplayState.effectiveFontWeight,
+        )
     }
+}
+
+@Composable
+private fun FontWeightControl(
+    modifier: Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    sliderValue: Float,
+    onSliderChange: (Float) -> Unit,
+    focusManager: FocusManager
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = stringResource(Res.string.font_weight),
+            useLabelAsPlaceholder = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            trailingIcon = {
+                Text(
+                    text = stringResource(Res.string.font_weight),
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+        )
+        Slider(
+            progress = sliderValue,
+            onProgressChange = onSliderChange,
+            minValue = 1f,
+            maxValue = 1000f
+        )
+    }
+}
+
+@Composable
+private fun FontSizeControl(
+    modifier: Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    sliderValue: Float,
+    onSliderChange: (Float) -> Unit,
+    focusManager: FocusManager
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = stringResource(Res.string.font_size),
+            useLabelAsPlaceholder = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            trailingIcon = {
+                Text(
+                    text = stringResource(Res.string.font_size),
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+        )
+        Slider(
+            progress = sliderValue,
+            onProgressChange = onSliderChange,
+            minValue = 6f,
+            maxValue = 96f
+        )
+    }
+}
+
+@Composable
+private fun CustomTextInput(
+    value: String,
+    onValueChange: (String) -> Unit,
+    focusManager: FocusManager
+) {
     TextField(
-        value = customText,
-        onValueChange = { newValue -> customText = newValue },
+        value = value,
+        onValueChange = onValueChange,
         label = stringResource(Res.string.custom_text),
         useLabelAsPlaceholder = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        modifier = Modifier.padding(top = 12.dp),
         trailingIcon = {
             val clearText = stringResource(Res.string.clear_text)
             val customTextLabel = stringResource(Res.string.custom_text)
             Text(
-                text = if (customText.isEmpty()) customTextLabel else clearText,
+                text = if (value.isEmpty()) customTextLabel else clearText,
                 fontSize = 14.sp,
                 modifier = Modifier
                     .then(
-                        if (customText.isNotEmpty())
+                        if (value.isNotEmpty())
                             Modifier.clickable(
                                 indication = null,
                                 interactionSource = null,
-                                onClick = { customText = "" }
+                                onClick = { onValueChange("") }
                             )
                         else Modifier
                     )
                     .padding(horizontal = 16.dp)
             )
         }
-    )
-    Text(
-        modifier = Modifier.padding(top = 12.dp),
-        text = customText.ifEmpty { "永 の A 6" },
-        fontSize = fontSizeValue.coerceIn(6, 96).sp,
-        fontWeight = FontWeight(fontWeightValue.coerceIn(1, 1000)),
     )
 }

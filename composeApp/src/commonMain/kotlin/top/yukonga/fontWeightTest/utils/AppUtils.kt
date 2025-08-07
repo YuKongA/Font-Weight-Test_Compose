@@ -1,5 +1,6 @@
 package top.yukonga.fontWeightTest.utils
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.font.FontWeight
 import fontweighttest.composeapp.generated.resources.Res
 import fontweighttest.composeapp.generated.resources.misans_black
@@ -12,6 +13,7 @@ import fontweighttest.composeapp.generated.resources.misans_normal
 import fontweighttest.composeapp.generated.resources.misans_semibold
 import fontweighttest.composeapp.generated.resources.misans_thin
 
+@Stable
 val fontWeightList = listOf(
     FontWeight.Thin, // W100
     FontWeight.ExtraLight, // W200
@@ -24,6 +26,7 @@ val fontWeightList = listOf(
     FontWeight.Black // W900
 )
 
+@Stable
 val miSansList = listOf(
     Res.font.misans_thin, // W100
     Res.font.misans_extralight, // W200
@@ -35,3 +38,19 @@ val miSansList = listOf(
     Res.font.misans_extrabold, // W800
     Res.font.misans_black // W900
 )
+
+@Stable
+val fontWeightDescriptions = listOf(
+    "淡体 Thin (Hairline)", // W100
+    "特细 ExtraLight (UltraLight)", // W200
+    "细体 Light", // W300
+    "标准 Normal (Regular)", // W400
+    "适中 Medium", // W500
+    "次粗 SemiBold (DemiBold)", // W600
+    "粗体 Bold", // W700
+    "特粗 ExtraBold (UltraBold)", // W800
+    "浓体 Black (Heavy)" // W900
+)
+
+@Stable
+val testCharacters = listOf("永", "の", "A", "6")

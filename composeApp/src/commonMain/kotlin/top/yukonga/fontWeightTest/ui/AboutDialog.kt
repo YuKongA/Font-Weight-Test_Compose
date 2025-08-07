@@ -47,8 +47,7 @@ fun AboutDialog() {
     val hapticFeedback = LocalHapticFeedback.current
 
     IconButton(
-        modifier = Modifier
-            .padding(start = 18.dp),
+        modifier = Modifier.padding(start = 18.dp),
         onClick = {
             showDialog.value = true
             hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
@@ -66,91 +65,133 @@ fun AboutDialog() {
     SuperDialog(
         show = showDialog,
         title = stringResource(Res.string.about),
-        onDismissRequest = {
-            showDialog.value = false
-        },
+        onDismissRequest = { showDialog.value = false },
         content = {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(SmoothRoundedCornerShape(12.dp))
-                        .background(MiuixTheme.colorScheme.primary)
-                ) {
-                    Image(
-                        painter = painterResource(Res.drawable.icon),
-                        colorFilter = ColorFilter.tint(MiuixTheme.colorScheme.onPrimary),
-                        contentDescription = null,
-                        modifier = Modifier.size(30.dp),
-                    )
+            AboutDialogContent(
+                onLinkClick = { url ->
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
                 }
-                Column {
-                    Text(
-                        text = stringResource(Res.string.app_name),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        text = VersionInfo.VERSION_NAME + " (" + VersionInfo.VERSION_CODE + ")",
-                    )
-                }
-            }
-            Column(
-                modifier = Modifier.padding(top = 12.dp)
-            ) {
-                val uriHandler = LocalUriHandler.current
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(Res.string.view_source) + " "
-                    )
-                    Text(
-                        text = AnnotatedString(
-                            text = "GitHub",
-                            spanStyle = SpanStyle(
-                                textDecoration = TextDecoration.Underline,
-                                color = MiuixTheme.colorScheme.primary
-                            )
-                        ),
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                uriHandler.openUri("https://github.com/YuKongA/Font-Weight-Test_Compose")
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            }
-                        )
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(Res.string.join_group) + " "
-                    )
-                    Text(
-                        text = AnnotatedString(
-                            text = "Telegram",
-                            spanStyle = SpanStyle(
-                                textDecoration = TextDecoration.Underline,
-                                color = MiuixTheme.colorScheme.primary
-                            )
-                        ),
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                uriHandler.openUri("https://t.me/YuKongA13579")
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            },
-                        )
-                    )
-                }
-                Spacer(modifier = Modifier.padding(top = 12.dp))
-                Text(
-                    text = stringResource(Res.string.opensource_info)
-                )
-            }
+            )
         }
     )
+}
+
+@Composable
+private fun AboutDialogContent(
+    onLinkClick: (String) -> Unit
+) {
+    val versionInfo = remember {
+        "${VersionInfo.VERSION_NAME} (${VersionInfo.VERSION_CODE})"
+    }
+
+    Column {
+        AppInfoSection(versionInfo = versionInfo)
+        LinksSection(onLinkClick = onLinkClick)
+        OpenSourceSection()
+    }
+}
+
+@Composable
+private fun AppInfoSection(versionInfo: String) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AppIcon()
+        AppDetails(versionInfo = versionInfo)
+    }
+}
+
+@Composable
+private fun AppIcon() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(48.dp)
+            .clip(SmoothRoundedCornerShape(12.dp))
+            .background(MiuixTheme.colorScheme.primary)
+    ) {
+        Image(
+            painter = painterResource(Res.drawable.icon),
+            colorFilter = ColorFilter.tint(MiuixTheme.colorScheme.onPrimary),
+            contentDescription = null,
+            modifier = Modifier.size(30.dp),
+        )
+    }
+}
+
+@Composable
+private fun AppDetails(versionInfo: String) {
+    Column {
+        Text(
+            text = stringResource(Res.string.app_name),
+            fontWeight = FontWeight.SemiBold
+        )
+        Text(text = versionInfo)
+    }
+}
+
+@Composable
+private fun LinksSection(onLinkClick: (String) -> Unit) {
+    Column(
+        modifier = Modifier.padding(top = 12.dp)
+    ) {
+        val uriHandler = LocalUriHandler.current
+
+        LinkRow(
+            prefixText = stringResource(Res.string.view_source),
+            linkText = "GitHub",
+            url = "https://github.com/YuKongA/Font-Weight-Test_Compose",
+            onClick = { url ->
+                uriHandler.openUri(url)
+                onLinkClick(url)
+            }
+        )
+
+        LinkRow(
+            prefixText = stringResource(Res.string.join_group),
+            linkText = "Telegram",
+            url = "https://t.me/YuKongA13579",
+            onClick = { url ->
+                uriHandler.openUri(url)
+                onLinkClick(url)
+            }
+        )
+    }
+}
+
+@Composable
+private fun LinkRow(
+    prefixText: String,
+    linkText: String,
+    url: String,
+    onClick: (String) -> Unit
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(text = "$prefixText ")
+
+        val primaryColor = MiuixTheme.colorScheme.primary
+        val annotatedLinkText = remember(linkText, primaryColor) {
+            AnnotatedString(
+                text = linkText,
+                spanStyle = SpanStyle(
+                    textDecoration = TextDecoration.Underline,
+                    color = primaryColor
+                )
+            )
+        }
+
+        Text(
+            text = annotatedLinkText,
+            modifier = Modifier.clickable { onClick(url) }
+        )
+    }
+}
+
+@Composable
+private fun OpenSourceSection() {
+    Column {
+        Spacer(modifier = Modifier.padding(top = 12.dp))
+        Text(text = stringResource(Res.string.opensource_info))
+    }
 }

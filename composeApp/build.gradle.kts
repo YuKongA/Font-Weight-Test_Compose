@@ -20,7 +20,7 @@ plugins {
 
 val appName = "FontWeightTest"
 val pkgName = "top.yukonga.fontWeightTest"
-val verName = "1.6.1"
+val verName = "1.6.2"
 val verCode = getVersionCode()
 val generatedSrcDir = layout.buildDirectory.dir("generated").get().asFile.resolve("fontWeightTest")
 kotlin {

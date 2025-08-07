@@ -15,17 +15,33 @@ fun WeightTextView(
     fontFamily: FontFamily = FontFamily.Default
 ) {
     val text = remember { "伤仲永 にほんご 한국어 AaBbCc 123" }
+
     Column {
         fontWeightList.forEachIndexed { index, fontWeight ->
-            val label = "${(index + 1) * 100} - $text"
-            Text(
+            val label = remember(index, text) { "${(index + 1) * 100} - $text" }
+            WeightTextItem(
                 text = label,
                 fontWeight = fontWeight,
                 fontFamily = fontFamily,
-                fontStyle = fontStyle,
-                fontSize = 15.4.sp,
-                maxLines = 1
+                fontStyle = fontStyle
             )
         }
     }
+}
+
+@Composable
+private fun WeightTextItem(
+    text: String,
+    fontWeight: androidx.compose.ui.text.font.FontWeight,
+    fontFamily: FontFamily,
+    fontStyle: FontStyle
+) {
+    Text(
+        text = text,
+        fontWeight = fontWeight,
+        fontFamily = fontFamily,
+        fontStyle = fontStyle,
+        fontSize = 15.4.sp,
+        maxLines = 1
+    )
 }

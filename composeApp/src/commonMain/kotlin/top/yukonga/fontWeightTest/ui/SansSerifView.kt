@@ -29,6 +29,7 @@ fun SansSerifView(
     padding: PaddingValues
 ) {
     val layoutDirection = LocalLayoutDirection.current
+
     LazyColumn(
         modifier = Modifier
             .scrollEndHaptic()
@@ -41,23 +42,33 @@ fun SansSerifView(
             bottom = padding.calculateBottomPadding() + 12.dp
         ),
     ) {
-        item {
+        item(key = "normal_font") {
             CardView {
                 WeightTextView()
             }
+        }
+
+        item(key = "italic_title") {
             SmallTitle(
                 modifier = Modifier.padding(top = 6.dp),
                 text = stringResource(Res.string.italic_font),
             )
+        }
+
+        item(key = "italic_font") {
             CardView {
                 WeightTextView(fontStyle = FontStyle.Italic)
             }
+        }
+
+        item(key = "examples_title") {
             SmallTitle(
                 modifier = Modifier.padding(top = 6.dp),
                 text = stringResource(Res.string.more_examples),
             )
         }
-        item {
+
+        item(key = "examples") {
             CardView {
                 OtherTestView()
             }

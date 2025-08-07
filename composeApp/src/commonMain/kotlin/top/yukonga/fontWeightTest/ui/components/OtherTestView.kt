@@ -3,8 +3,9 @@ package top.yukonga.fontWeightTest.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
@@ -17,41 +18,65 @@ import top.yukonga.miuix.kmp.basic.Text
 
 @Composable
 fun OtherTestView(fontFamily: FontFamily? = null) {
-    OtherTestText(
+    val testText = remember {
         "不以物喜，不以己悲。——范仲淹《岳阳楼记》\n" +
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n" +
                 "abcdefghijklmnopqrstuvwxyz\n" +
-                "0123456789,.",
-        fontFamily
-    )
-}
+                "0123456789,."
+    }
 
-@Composable
-fun OtherTestText(text: String, fontFamily: FontFamily?) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         fontWeightList.forEachIndexed { index, fontWeight ->
-            val label = "- ${(index + 1) * 100} - \n$text"
-            Text(
-                text = label,
+            OtherTestTextItem(
+                index = index,
+                text = testText,
                 fontWeight = fontWeight,
-                fontFamily = fontFamily,
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp
-            )
-            Text(
-                text = text,
-                fontWeight = fontWeight,
-                fontFamily = fontFamily,
-                fontStyle = FontStyle.Italic,
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp
+                fontFamily = fontFamily
             )
             if (index < fontWeightList.size - 1) {
-                Spacer(modifier = Modifier.padding(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
+    }
+}
+
+@Composable
+private fun OtherTestTextItem(
+    index: Int,
+    text: String,
+    fontWeight: androidx.compose.ui.text.font.FontWeight,
+    fontFamily: FontFamily?
+) {
+    val label = remember(index) { "- ${(index + 1) * 100} -" }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            fontWeight = fontWeight,
+            fontFamily = fontFamily,
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp
+        )
+        Text(
+            text = text,
+            fontWeight = fontWeight,
+            fontFamily = fontFamily,
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp
+        )
+        Text(
+            text = text,
+            fontWeight = fontWeight,
+            fontFamily = fontFamily,
+            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp
+        )
     }
 }
