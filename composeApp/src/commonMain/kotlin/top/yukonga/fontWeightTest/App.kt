@@ -4,15 +4,14 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -27,7 +26,6 @@ import fontweighttest.composeapp.generated.resources.home
 import fontweighttest.composeapp.generated.resources.monospace
 import fontweighttest.composeapp.generated.resources.sans_serif
 import fontweighttest.composeapp.generated.resources.serif
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -45,7 +43,9 @@ import top.yukonga.miuix.kmp.basic.SmallTopAppBar
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
-@OptIn(FlowPreview::class)
+val LocalPagerState = compositionLocalOf<PagerState> { error("No pager state") }
+val LocalHandlePageChange = compositionLocalOf<(Int) -> Unit> { error("No handle page change") }
+
 @Composable
 fun App(
     isDarkTheme: Boolean = isSystemInDarkTheme()
@@ -55,95 +55,118 @@ fun App(
     ) {
         val coroutineScope = rememberCoroutineScope()
         val topAppBarScrollBehaviorList = List(4) { MiuixScrollBehavior() }
-        val pagerState = rememberPagerState(pageCount = { 4 })
-        var selectedPage by remember { mutableIntStateOf(pagerState.currentPage) }
-        val currentScrollBehavior = topAppBarScrollBehaviorList[selectedPage]
 
-        LaunchedEffect(pagerState.settledPage) {
-            if (selectedPage != pagerState.settledPage) selectedPage = pagerState.settledPage
+        val pagerState = rememberPagerState(pageCount = { 4 })
+        val currentScrollBehavior = topAppBarScrollBehaviorList[pagerState.currentPage]
+        val handlePageChange: (Int) -> Unit = remember(pagerState, coroutineScope) {
+            { page ->
+                coroutineScope.launch { pagerState.animateScrollToPage(page) }
+            }
         }
 
         val navigationItems = listOf(
-            NavigationItem(
-                stringResource(Res.string.home),
-                vectorResource(Res.drawable.home)
-            ),
-            NavigationItem(
-                stringResource(Res.string.sans_serif),
-                vectorResource(Res.drawable.sans_serif)
-            ),
-            NavigationItem(
-                stringResource(Res.string.serif),
-                vectorResource(Res.drawable.serif)
-            ),
-            NavigationItem(
-                stringResource(Res.string.monospace),
-                vectorResource(Res.drawable.monospace)
-            ),
+            NavigationItem(stringResource(Res.string.home), vectorResource(Res.drawable.home)),
+            NavigationItem(stringResource(Res.string.sans_serif), vectorResource(Res.drawable.sans_serif)),
+            NavigationItem(stringResource(Res.string.serif), vectorResource(Res.drawable.serif)),
+            NavigationItem(stringResource(Res.string.monospace), vectorResource(Res.drawable.monospace)),
         )
 
         val hazeState = remember { HazeState() }
 
-        val hazeStyleNavigationBar = HazeStyle(
+        val hazeStyle = HazeStyle(
             backgroundColor = MiuixTheme.colorScheme.background,
             tint = HazeTint(MiuixTheme.colorScheme.background.copy(0.67f))
         )
 
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
+        CompositionLocalProvider(
+            LocalPagerState provides pagerState,
+            LocalHandlePageChange provides handlePageChange,
+        ) {
+            val page = LocalPagerState.current.targetPage
+            val handlePageChange = LocalHandlePageChange.current
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                topBar = {
+                    BoxWithConstraints {
+                        if (maxWidth < 768.dp) {
+                            TopAppBar(
+                                color = Color.Transparent,
+                                modifier = Modifier.hazeEffect(hazeState) {
+                                    style = hazeStyle
+                                    blurRadius = 25.dp
+                                    noiseFactor = 0f
+                                },
+                                title = stringResource(Res.string.app_name),
+                                navigationIcon = { AboutDialog() },
+                                scrollBehavior = currentScrollBehavior
+                            )
+                        } else {
+                            SmallTopAppBar(
+                                color = Color.Transparent,
+                                modifier = Modifier.hazeEffect(hazeState) {
+                                    style = hazeStyle
+                                    blurRadius = 25.dp
+                                    noiseFactor = 0f
+                                },
+                                title = stringResource(Res.string.app_name),
+                                navigationIcon = { AboutDialog() },
+                                scrollBehavior = currentScrollBehavior
+                            )
+                        }
+                    }
+                },
+                bottomBar = {
+                    NavigationBar(
+                        color = Color.Transparent,
+                        modifier = Modifier.hazeEffect(hazeState) {
+                            style = hazeStyle
+                            blurRadius = 25.dp
+                            noiseFactor = 0f
+                        },
+                        items = navigationItems,
+                        selected = page,
+                        onClick = handlePageChange,
+                    )
+                }
+            ) { padding ->
                 BoxWithConstraints {
                     if (maxWidth < 768.dp) {
-                        TopAppBar(
-                            title = stringResource(Res.string.app_name),
-                            navigationIcon = { AboutDialog() },
-                            scrollBehavior = currentScrollBehavior
+                        HorizontalPager(
+                            modifier = Modifier
+                                .hazeSource(state = hazeState),
+                            state = pagerState,
+                            userScrollEnabled = false,
+                            pageContent = { page ->
+                                key(page) {
+                                    when (page) {
+                                        0 -> HomeView(topAppBarScrollBehaviorList[0], padding)
+                                        1 -> SansSerifView(topAppBarScrollBehaviorList[1], padding)
+                                        2 -> SerifView(topAppBarScrollBehaviorList[2], padding)
+                                        3 -> MonospaceView(topAppBarScrollBehaviorList[3], padding)
+                                    }
+                                }
+                            }
                         )
                     } else {
-                        SmallTopAppBar(
-                            title = stringResource(Res.string.app_name),
-                            navigationIcon = { AboutDialog() },
-                            scrollBehavior = currentScrollBehavior
+                        HorizontalPager(
+                            modifier = Modifier
+                                .hazeSource(state = hazeState),
+                            state = pagerState,
+                            userScrollEnabled = false,
+                            pageContent = { page ->
+                                key(page) {
+                                    when (page) {
+                                        0 -> HomeView(topAppBarScrollBehaviorList[0], padding)
+                                        1 -> SansSerifView(topAppBarScrollBehaviorList[1], padding)
+                                        2 -> SerifView(topAppBarScrollBehaviorList[2], padding)
+                                        3 -> MonospaceView(topAppBarScrollBehaviorList[3], padding)
+                                    }
+                                }
+                            }
                         )
                     }
                 }
-            },
-            bottomBar = {
-                NavigationBar(
-                    color = Color.Transparent,
-                    modifier = Modifier.hazeEffect(hazeState) {
-                        style = hazeStyleNavigationBar
-                        blurRadius = 25.dp
-                        noiseFactor = 0f
-                    },
-                    items = navigationItems,
-                    selected = selectedPage,
-                    onClick = { index ->
-                        selectedPage = index
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    }
-                )
             }
-        ) { padding ->
-            HorizontalPager(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .hazeSource(state = hazeState),
-                state = pagerState,
-                userScrollEnabled = false,
-                pageContent = { page ->
-                    key(page) {
-                        when (page) {
-                            0 -> HomeView(topAppBarScrollBehaviorList[0], padding)
-                            1 -> SansSerifView(topAppBarScrollBehaviorList[1], padding)
-                            2 -> SerifView(topAppBarScrollBehaviorList[2], padding)
-                            3 -> MonospaceView(topAppBarScrollBehaviorList[3], padding)
-                        }
-                    }
-                }
-            )
         }
     }
 }

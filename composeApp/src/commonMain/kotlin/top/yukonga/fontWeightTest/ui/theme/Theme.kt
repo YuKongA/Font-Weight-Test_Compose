@@ -11,11 +11,7 @@ fun AppTheme(
     content: @Composable () -> Unit
 ) {
     MiuixTheme(
-        colors = if (isDarkTheme) {
-            darkColorScheme()
-        } else {
-            lightColorScheme()
-        }
+        colors = if (isDarkTheme) darkColorScheme() else lightColorScheme()
     ) {
         content()
     }

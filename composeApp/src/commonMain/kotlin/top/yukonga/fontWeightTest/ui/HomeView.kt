@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,11 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -44,6 +47,7 @@ import top.yukonga.miuix.kmp.basic.SmallTitle
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.utils.overScrollVertical
+import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 
 @Composable
 fun HomeView(
@@ -51,24 +55,29 @@ fun HomeView(
     padding: PaddingValues
 ) {
     val focusManager = LocalFocusManager.current
+    val layoutDirection = LocalLayoutDirection.current
     LazyColumn(
         modifier = Modifier
+            .scrollEndHaptic()
             .overScrollVertical()
             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
             .clickable(
                 indication = null,
                 interactionSource = null,
-            ) {
-                focusManager.clearFocus()
-            }
+                onClick = { focusManager.clearFocus() }
+            ),
+        contentPadding = PaddingValues(
+            top = padding.calculateTopPadding() + 12.dp,
+            start = padding.calculateStartPadding(layoutDirection),
+            end = padding.calculateEndPadding(layoutDirection),
+            bottom = padding.calculateBottomPadding() + 12.dp
+        ),
     ) {
         item {
-            Spacer(Modifier.height(12.dp + padding.calculateTopPadding()))
             CardView {
                 AllWeightText()
             }
             PortraitContent()
-            Spacer(Modifier.height(padding.calculateBottomPadding() + 12.dp))
         }
     }
 }
@@ -101,15 +110,22 @@ fun ComparisonDisplay() {
 @Composable
 fun AllWeightText() {
     Column {
-        WeightText("100 - 淡体 Thin (Hairline)", FontWeight.Thin)
-        WeightText("200 - 特细 ExtraLight (UltraLight)", FontWeight.ExtraLight)
-        WeightText("300 - 细体 Light", FontWeight.Light)
-        WeightText("400 - 标准 Normal (Regular)", FontWeight.Normal)
-        WeightText("500 - 适中 Medium", FontWeight.Medium)
-        WeightText("600 - 次粗 SemiBold (DemiBold)", FontWeight.SemiBold)
-        WeightText("700 - 粗体 Bold", FontWeight.Bold)
-        WeightText("800 - 特粗 ExtraBold (UltraBold)", FontWeight.ExtraBold)
-        WeightText("900 - 浓体 Black (Heavy)", FontWeight.Black)
+        fontWeightList.forEachIndexed { index, fontWeight ->
+            WeightText(
+                "${(index + 1) * 100} - " + when (index) {
+                    0 -> "淡体 Thin (Hairline)"
+                    1 -> "特细 ExtraLight (UltraLight)"
+                    2 -> "细体 Light"
+                    3 -> "标准 Normal (Regular)"
+                    4 -> "适中 Medium"
+                    5 -> "次粗 SemiBold (DemiBold)"
+                    6 -> "粗体 Bold"
+                    7 -> "特粗 ExtraBold (UltraBold)"
+                    8 -> "浓体 Black (Heavy)"
+                    else -> ""
+                }, fontWeight
+            )
+        }
     }
 }
 
@@ -126,10 +142,7 @@ fun WeightText(description: String, fontWeight: FontWeight) {
 fun MiSansTestView(text: String) {
     Column {
         Text(text = text)
-        MiSansTest("永")
-        MiSansTest("の")
-        MiSansTest("A")
-        MiSansTest("6")
+        listOf("永", "の", "A", "6").forEach { MiSansTest(it) }
     }
 }
 
@@ -150,10 +163,7 @@ fun MiSansTest(text: String) {
 fun DeviceFontTestView(text: String) {
     Column {
         Text(text = text)
-        MoreTestText("永")
-        MoreTestText("の")
-        MoreTestText("A")
-        MoreTestText("6")
+        listOf("永", "の", "A", "6").forEach { MoreTestText(it) }
     }
 }
 
@@ -171,11 +181,11 @@ fun MoreTestText(text: String) {
 
 @Composable
 fun SliderTestView() {
-    var customText by remember { mutableStateOf("".ifEmpty { "永 の A 6" }) }
-    var fontSizeValue by remember { mutableIntStateOf(24) }
-    var fontSizeText by remember { mutableStateOf(fontSizeValue.toString()) }
-    var fontWeightValue by remember { mutableIntStateOf(400) }
-    var fontWeightText by remember { mutableStateOf(fontWeightValue.toString()) }
+    var customText by rememberSaveable { mutableStateOf("") }
+    var fontSizeValue by rememberSaveable { mutableIntStateOf(24) }
+    var fontSizeText by rememberSaveable { mutableStateOf(fontSizeValue.toString()) }
+    var fontWeightValue by rememberSaveable { mutableIntStateOf(400) }
+    var fontWeightText by rememberSaveable { mutableStateOf(fontWeightValue.toString()) }
     val focusManager = LocalFocusManager.current
 
     Row(
@@ -258,15 +268,17 @@ fun SliderTestView() {
     }
     TextField(
         value = customText,
-        onValueChange = { customText = it },
+        onValueChange = { newValue -> customText = newValue },
         label = stringResource(Res.string.custom_text),
         useLabelAsPlaceholder = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         modifier = Modifier.padding(top = 12.dp),
         trailingIcon = {
+            val clearText = stringResource(Res.string.clear_text)
+            val customTextLabel = stringResource(Res.string.custom_text)
             Text(
-                text = if (customText.isEmpty()) stringResource(Res.string.custom_text) else stringResource(Res.string.clear_text),
+                text = if (customText.isEmpty()) customTextLabel else clearText,
                 fontSize = 14.sp,
                 modifier = Modifier
                     .then(
@@ -274,9 +286,8 @@ fun SliderTestView() {
                             Modifier.clickable(
                                 indication = null,
                                 interactionSource = null,
-                            ) {
-                                customText = ""
-                            }
+                                onClick = { customText = "" }
+                            )
                         else Modifier
                     )
                     .padding(horizontal = 16.dp)

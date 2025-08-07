@@ -33,8 +33,9 @@ fun OtherTestText(text: String, fontFamily: FontFamily?) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         fontWeightList.forEachIndexed { index, fontWeight ->
+            val label = "- ${(index + 1) * 100} - \n$text"
             Text(
-                text = "- ${(index + 1) * 100} - \n$text",
+                text = label,
                 fontWeight = fontWeight,
                 fontFamily = fontFamily,
                 textAlign = TextAlign.Center,

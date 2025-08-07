@@ -20,7 +20,7 @@ plugins {
 
 val appName = "FontWeightTest"
 val pkgName = "top.yukonga.fontWeightTest"
-val verName = "1.6.0"
+val verName = "1.6.1"
 val verCode = getVersionCode()
 val generatedSrcDir = layout.buildDirectory.dir("generated").get().asFile.resolve("fontWeightTest")
 kotlin {
@@ -201,6 +201,20 @@ val generateVersionInfo by tasks.registering {
             }
             """.trimIndent()
         )
+        val iosPlist = project.rootDir.resolve("iosApp/iosApp/Info.plist")
+        if (iosPlist.exists()) {
+            val content = iosPlist.readText()
+            val updatedContent = content
+                .replace(
+                    Regex("<key>CFBundleShortVersionString</key>\\s*<string>[^<]*</string>"),
+                    "<key>CFBundleShortVersionString</key>\n\t<string>$verName</string>"
+                )
+                .replace(
+                    Regex("<key>CFBundleVersion</key>\\s*<string>[^<]*</string>"),
+                    "<key>CFBundleVersion</key>\n\t<string>$verCode</string>"
+                )
+            iosPlist.writeText(updatedContent)
+        }
     }
 }
 
