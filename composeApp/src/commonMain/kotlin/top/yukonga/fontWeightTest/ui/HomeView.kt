@@ -45,7 +45,8 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.fontWeightTest.ui.components.CardView
 import top.yukonga.fontWeightTest.utils.fontWeightDescriptions
-import top.yukonga.fontWeightTest.utils.fontWeightList
+import top.yukonga.fontWeightTest.utils.fontWeightsList
+import top.yukonga.fontWeightTest.utils.getOptimizedFontWeight
 import top.yukonga.fontWeightTest.utils.miSansList
 import top.yukonga.fontWeightTest.utils.testCharacters
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
@@ -63,7 +64,9 @@ data class FontDisplayState(
     val fontWeightValue: Int = 400
 ) {
     val effectiveFontSize = fontSizeValue.coerceIn(6, 96)
-    val effectiveFontWeight = FontWeight(fontWeightValue.coerceIn(1, 1000))
+    val effectiveFontWeight by lazy {
+        getOptimizedFontWeight(fontWeightValue.coerceIn(1, 999))
+    }
     val displayText = customText.ifEmpty { "永 の A 6" }
 }
 
@@ -140,7 +143,7 @@ fun ComparisonDisplay() {
 @Composable
 fun AllWeightText() {
     Column {
-        fontWeightList.forEachIndexed { index, fontWeight ->
+        fontWeightsList.forEachIndexed { index, fontWeight ->
             WeightText(
                 "${(index + 1) * 100} - ${fontWeightDescriptions[index]}",
                 fontWeight
@@ -168,12 +171,15 @@ fun MiSansTestView(text: String) {
 
 @Composable
 fun MiSansTest(text: String) {
+    val fontList = remember { miSansList }
+    val weightList = remember { fontWeightsList }
+
     Row {
-        fontWeightList.forEachIndexed { index, fontWeight ->
+        weightList.forEachIndexed { index, fontWeight ->
             Text(
                 text = text,
                 fontWeight = fontWeight,
-                fontFamily = FontFamily(Font(miSansList[index], weight = fontWeight))
+                fontFamily = FontFamily(Font(fontList[index], weight = fontWeight))
             )
         }
     }
@@ -189,8 +195,10 @@ fun DeviceFontTestView(text: String) {
 
 @Composable
 fun MoreTestText(text: String) {
+    val weightList = remember { fontWeightsList }
+
     Row {
-        fontWeightList.forEach { fontWeight ->
+        weightList.forEach { fontWeight ->
             Text(
                 text = text,
                 fontWeight = fontWeight
@@ -207,7 +215,7 @@ fun SliderTestView() {
     var fontWeightValue by rememberSaveable { mutableIntStateOf(400) }
     var fontWeightText by rememberSaveable { mutableStateOf(fontWeightValue.toString()) }
 
-    val fontDisplayState by remember {
+    val fontDisplayState by remember(customText, fontSizeValue, fontWeightValue) {
         derivedStateOf {
             FontDisplayState(
                 customText = customText,
@@ -219,6 +227,44 @@ fun SliderTestView() {
 
     val focusManager = LocalFocusManager.current
 
+    val onFontWeightTextChange = remember {
+        { newValue: String ->
+            if (newValue.isEmpty()) {
+                fontWeightValue = 1
+                fontWeightText = ""
+            } else if (newValue.all { it.isDigit() }) {
+                fontWeightValue = newValue.toInt().coerceIn(1, 1000)
+                fontWeightText = fontWeightValue.toString()
+            }
+        }
+    }
+
+    val onFontWeightSliderChange = remember {
+        { newValue: Float ->
+            fontWeightValue = newValue.toInt()
+            fontWeightText = newValue.toInt().toString()
+        }
+    }
+
+    val onFontSizeTextChange = remember {
+        { newValue: String ->
+            if (newValue.isEmpty()) {
+                fontSizeValue = 6
+                fontSizeText = ""
+            } else if (newValue.all { it.isDigit() }) {
+                fontSizeValue = newValue.toInt().coerceIn(6, 96)
+                fontSizeText = fontSizeValue.toString()
+            }
+        }
+    }
+
+    val onFontSizeSliderChange = remember {
+        { newValue: Float ->
+            fontSizeValue = newValue.toInt()
+            fontSizeText = newValue.toInt().toString()
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -228,40 +274,18 @@ fun SliderTestView() {
             FontWeightControl(
                 modifier = Modifier.weight(0.5f),
                 value = fontWeightText,
-                onValueChange = { newValue ->
-                    if (newValue.isEmpty()) {
-                        fontWeightValue = 1
-                        fontWeightText = ""
-                    } else if (newValue.all { it.isDigit() }) {
-                        fontWeightValue = newValue.toInt().coerceIn(1, 1000)
-                        fontWeightText = fontWeightValue.toString()
-                    }
-                },
+                onValueChange = onFontWeightTextChange,
                 sliderValue = fontWeightValue.toFloat(),
-                onSliderChange = { newValue ->
-                    fontWeightValue = newValue.toInt()
-                    fontWeightText = newValue.toInt().toString()
-                },
+                onSliderChange = onFontWeightSliderChange,
                 focusManager = focusManager
             )
 
             FontSizeControl(
                 modifier = Modifier.weight(0.5f),
                 value = fontSizeText,
-                onValueChange = { newValue ->
-                    if (newValue.isEmpty()) {
-                        fontSizeValue = 6
-                        fontSizeText = ""
-                    } else if (newValue.all { it.isDigit() }) {
-                        fontSizeValue = newValue.toInt().coerceIn(6, 96)
-                        fontSizeText = fontSizeValue.toString()
-                    }
-                },
+                onValueChange = onFontSizeTextChange,
                 sliderValue = fontSizeValue.toFloat(),
-                onSliderChange = { newValue ->
-                    fontSizeValue = newValue.toInt()
-                    fontSizeText = newValue.toInt().toString()
-                },
+                onSliderChange = onFontSizeSliderChange,
                 focusManager = focusManager
             )
         }

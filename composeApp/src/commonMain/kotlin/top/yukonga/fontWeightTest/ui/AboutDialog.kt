@@ -39,7 +39,7 @@ import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.SmoothRoundedCornerShape
+import top.yukonga.miuix.kmp.utils.G2RoundedCornerShape
 
 @Composable
 fun AboutDialog() {
@@ -108,7 +108,7 @@ private fun AppIcon() {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(48.dp)
-            .clip(SmoothRoundedCornerShape(12.dp))
+            .clip(G2RoundedCornerShape(12.dp))
             .background(MiuixTheme.colorScheme.primary)
     ) {
         Image(

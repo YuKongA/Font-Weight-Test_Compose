@@ -14,7 +14,7 @@ import fontweighttest.composeapp.generated.resources.misans_semibold
 import fontweighttest.composeapp.generated.resources.misans_thin
 
 @Stable
-val fontWeightList = listOf(
+val fontWeightsList = listOf(
     FontWeight.Thin, // W100
     FontWeight.ExtraLight, // W200
     FontWeight.Light, // W300
@@ -24,6 +24,19 @@ val fontWeightList = listOf(
     FontWeight.Bold, // W700
     FontWeight.ExtraBold, // W800
     FontWeight.Black // W900
+)
+
+@Stable
+val commonFontWeights = mapOf(
+    100 to FontWeight.Thin,
+    200 to FontWeight.ExtraLight,
+    300 to FontWeight.Light,
+    400 to FontWeight.Normal,
+    500 to FontWeight.Medium,
+    600 to FontWeight.SemiBold,
+    700 to FontWeight.Bold,
+    800 to FontWeight.ExtraBold,
+    900 to FontWeight.Black
 )
 
 @Stable

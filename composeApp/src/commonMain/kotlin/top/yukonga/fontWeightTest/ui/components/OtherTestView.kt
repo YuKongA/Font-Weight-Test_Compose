@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import top.yukonga.fontWeightTest.utils.fontWeightList
+import top.yukonga.fontWeightTest.utils.fontWeightsList
 import top.yukonga.miuix.kmp.basic.Text
 
 @Composable
@@ -29,14 +29,14 @@ fun OtherTestView(fontFamily: FontFamily? = null) {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        fontWeightList.forEachIndexed { index, fontWeight ->
+        fontWeightsList.forEachIndexed { index, fontWeight ->
             OtherTestTextItem(
                 index = index,
                 text = testText,
                 fontWeight = fontWeight,
                 fontFamily = fontFamily
             )
-            if (index < fontWeightList.size - 1) {
+            if (index < fontWeightsList.size - 1) {
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
