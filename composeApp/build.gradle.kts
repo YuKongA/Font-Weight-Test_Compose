@@ -33,6 +33,9 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach {
+        it.compilerOptions {
+            freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
+        }
         it.binaries.framework {
             baseName = "shared"
             isStatic = true
@@ -43,6 +46,9 @@ kotlin {
         macosX64(),
         macosArm64(),
     ).forEach {
+        it.compilerOptions {
+            freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
+        }
         it.binaries.executable {
             entryPoint = "main"
         }
