@@ -334,10 +334,9 @@ private fun FontWeightControl(
             }
         )
         Slider(
-            progress = sliderValue,
-            onProgressChange = onSliderChange,
-            minValue = 1f,
-            maxValue = 1000f
+            value = sliderValue,
+            onValueChange = onSliderChange,
+            valueRange = 1f..1000f
         )
     }
 }
@@ -371,10 +370,9 @@ private fun FontSizeControl(
             }
         )
         Slider(
-            progress = sliderValue,
-            onProgressChange = onSliderChange,
-            minValue = 6f,
-            maxValue = 96f
+            value = sliderValue,
+            onValueChange = onSliderChange,
+            valueRange = 6f..96f
         )
     }
 }

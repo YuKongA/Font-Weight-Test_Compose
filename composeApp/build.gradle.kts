@@ -29,7 +29,6 @@ kotlin {
     jvm("desktop")
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach {
@@ -43,7 +42,6 @@ kotlin {
     }
 
     listOf(
-        macosX64(),
         macosArm64(),
     ).forEach {
         it.compilerOptions {
@@ -163,7 +161,7 @@ compose.desktop {
             }
         }
         nativeApplication {
-            targets(kotlin.targets.getByName("macosArm64"), kotlin.targets.getByName("macosX64"))
+            targets(kotlin.targets.getByName("macosArm64"))
             distributions {
                 targetFormats(TargetFormat.Dmg)
                 packageName = appName
@@ -231,7 +229,7 @@ tasks.named("generateComposeResClass").configure {
 afterEvaluate {
     project.extensions.getByType<KotlinMultiplatformExtension>().targets
         .withType<KotlinNativeTarget>()
-        .filter { it.konanTarget == KonanTarget.MACOS_ARM64 || it.konanTarget == KonanTarget.MACOS_X64 }
+        .filter { it.konanTarget == KonanTarget.MACOS_ARM64 }
         .forEach { target ->
             val targetName = target.targetName.uppercaseFirstChar()
             val buildTypes = mapOf(
@@ -247,7 +245,7 @@ afterEvaluate {
                         val copyTask = tasks.register<Copy>(taskName) {
                             from({
                                 (executable.compilation.associatedCompilations + executable.compilation).flatMap { compilation ->
-                                    compilation.allKotlinSourceSets.map { it -> it.resources }
+                                    compilation.allKotlinSourceSets.map { it.resources }
                                 }
                             })
                             into(executable.outputDirectory.resolve("compose-resources"))
@@ -266,7 +264,7 @@ tasks.withType<AbstractNativeMacApplicationPackageAppDirTask>().configureEach {
         val appDir = destinationDir.resolve("$packageName.app")
         val resourcesDir = appDir.resolve("Contents/Resources")
         val currentMacosTarget = kotlin.targets.withType<KotlinNativeTarget>()
-            .find { it.konanTarget == KonanTarget.MACOS_ARM64 || it.konanTarget == KonanTarget.MACOS_X64 }?.targetName
+            .find { it.konanTarget == KonanTarget.MACOS_ARM64 }?.targetName
         val composeResourcesDir = project.rootDir
             .resolve("composeApp/build/bin/$currentMacosTarget/releaseExecutable/compose-resources")
         if (composeResourcesDir.exists()) {

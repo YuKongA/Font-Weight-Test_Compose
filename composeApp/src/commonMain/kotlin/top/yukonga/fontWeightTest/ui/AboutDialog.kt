@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +40,6 @@ import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.extra.SuperDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.G2RoundedCornerShape
 
 @Composable
 fun AboutDialog() {
@@ -68,7 +68,7 @@ fun AboutDialog() {
         onDismissRequest = { showDialog.value = false },
         content = {
             AboutDialogContent(
-                onLinkClick = { url ->
+                onLinkClick = {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
                 }
             )
@@ -108,7 +108,7 @@ private fun AppIcon() {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(48.dp)
-            .clip(G2RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(MiuixTheme.colorScheme.primary)
     ) {
         Image(
