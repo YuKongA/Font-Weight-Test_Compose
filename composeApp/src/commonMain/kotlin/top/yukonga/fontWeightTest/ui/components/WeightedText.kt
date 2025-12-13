@@ -1,7 +1,6 @@
 package top.yukonga.fontWeightTest.ui.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
@@ -13,12 +12,9 @@ fun WeightTextView(
     fontStyle: FontStyle = FontStyle.Normal,
     fontFamily: FontFamily = FontFamily.Default
 ) {
-    val text = remember { "伤仲永 にほんご 한국어 AaBbCc 123" }
-
-    val labels = remember(text) {
-        fontWeightsList.mapIndexed { index, _ ->
-            "${(index + 1) * 100} - $text"
-        }
+    val text = "伤仲永 にほんご 한국어 AaBbCc 123"
+    val labels = fontWeightsList.mapIndexed { index, _ ->
+        "${(index + 1) * 100} - $text"
     }
 
     fontWeightsList.forEachIndexed { index, fontWeight ->

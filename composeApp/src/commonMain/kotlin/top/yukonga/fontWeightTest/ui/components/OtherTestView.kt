@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
@@ -18,12 +17,10 @@ import top.yukonga.miuix.kmp.basic.Text
 
 @Composable
 fun OtherTestView(fontFamily: FontFamily? = null) {
-    val testText = remember {
-        "不以物喜，不以己悲。——范仲淹《岳阳楼记》\n" +
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n" +
-                "abcdefghijklmnopqrstuvwxyz\n" +
-                "0123456789,."
-    }
+    val testText = "不以物喜，不以己悲。——范仲淹《岳阳楼记》\n" +
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n" +
+            "abcdefghijklmnopqrstuvwxyz\n" +
+            "0123456789,."
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -50,7 +47,7 @@ private fun OtherTestTextItem(
     fontWeight: androidx.compose.ui.text.font.FontWeight,
     fontFamily: FontFamily?
 ) {
-    val label = remember(index) { "- ${(index + 1) * 100} -" }
+    val label = "- ${(index + 1) * 100} -"
 
     Column(
         modifier = Modifier.fillMaxWidth(),

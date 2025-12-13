@@ -80,10 +80,13 @@ fun App(
         )
 
         val hazeState = remember { HazeState() }
-        val hazeStyle = HazeStyle(
-            backgroundColor = MiuixTheme.colorScheme.background,
-            tint = HazeTint(MiuixTheme.colorScheme.background.copy(0.67f))
-        )
+        val surface = MiuixTheme.colorScheme.surface
+        val hazeStyle = remember(surface) {
+            HazeStyle(
+                backgroundColor = surface,
+                tint = HazeTint(surface.copy(0.67f))
+            )
+        }
 
         CompositionLocalProvider(
             LocalPagerState provides pagerState,
@@ -166,39 +169,19 @@ private fun PagerContent(
     topAppBarScrollBehaviorList: List<ScrollBehavior>,
     padding: PaddingValues
 ) {
-    BoxWithConstraints {
-        if (maxWidth < 768.dp) {
-            HorizontalPager(
-                modifier = Modifier.hazeSource(state = hazeState),
-                state = pagerState,
-                userScrollEnabled = false,
-                pageContent = { page ->
-                    key(page) {
-                        when (page) {
-                            0 -> HomeView(topAppBarScrollBehaviorList[0], padding)
-                            1 -> SansSerifView(topAppBarScrollBehaviorList[1], padding)
-                            2 -> SerifView(topAppBarScrollBehaviorList[2], padding)
-                            3 -> MonospaceView(topAppBarScrollBehaviorList[3], padding)
-                        }
-                    }
+    HorizontalPager(
+        modifier = Modifier.hazeSource(state = hazeState),
+        state = pagerState,
+        userScrollEnabled = false,
+        pageContent = { page ->
+            key(page) {
+                when (page) {
+                    0 -> HomeView(topAppBarScrollBehaviorList[0], padding)
+                    1 -> SansSerifView(topAppBarScrollBehaviorList[1], padding)
+                    2 -> SerifView(topAppBarScrollBehaviorList[2], padding)
+                    3 -> MonospaceView(topAppBarScrollBehaviorList[3], padding)
                 }
-            )
-        } else {
-            HorizontalPager(
-                modifier = Modifier.hazeSource(state = hazeState),
-                state = pagerState,
-                userScrollEnabled = false,
-                pageContent = { page ->
-                    key(page) {
-                        when (page) {
-                            0 -> HomeView(topAppBarScrollBehaviorList[0], padding)
-                            1 -> SansSerifView(topAppBarScrollBehaviorList[1], padding)
-                            2 -> SerifView(topAppBarScrollBehaviorList[2], padding)
-                            3 -> MonospaceView(topAppBarScrollBehaviorList[3], padding)
-                        }
-                    }
-                }
-            )
+            }
         }
-    }
+    )
 }

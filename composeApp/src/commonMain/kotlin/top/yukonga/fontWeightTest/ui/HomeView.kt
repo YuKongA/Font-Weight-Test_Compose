@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -44,9 +43,9 @@ import fontweighttest.composeapp.generated.resources.variable_font
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.fontWeightTest.ui.components.CardView
+import top.yukonga.fontWeightTest.utils.FontDisplayState
 import top.yukonga.fontWeightTest.utils.fontWeightDescriptions
 import top.yukonga.fontWeightTest.utils.fontWeightsList
-import top.yukonga.fontWeightTest.utils.getOptimizedFontWeight
 import top.yukonga.fontWeightTest.utils.miSansList
 import top.yukonga.fontWeightTest.utils.testCharacters
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
@@ -56,19 +55,6 @@ import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 import top.yukonga.miuix.kmp.utils.scrollEndHaptic
-
-@Stable
-data class FontDisplayState(
-    val customText: String = "",
-    val fontSizeValue: Int = 24,
-    val fontWeightValue: Int = 400
-) {
-    val effectiveFontSize = fontSizeValue.coerceIn(6, 96)
-    val effectiveFontWeight by lazy {
-        getOptimizedFontWeight(fontWeightValue.coerceIn(1, 999))
-    }
-    val displayText = customText.ifEmpty { "永 の A 6" }
-}
 
 @Composable
 fun HomeView(
@@ -171,15 +157,12 @@ fun MiSansTestView(text: String) {
 
 @Composable
 fun MiSansTest(text: String) {
-    val fontList = remember { miSansList }
-    val weightList = remember { fontWeightsList }
-
     Row {
-        weightList.forEachIndexed { index, fontWeight ->
+        fontWeightsList.forEachIndexed { index, fontWeight ->
             Text(
                 text = text,
                 fontWeight = fontWeight,
-                fontFamily = FontFamily(Font(fontList[index], weight = fontWeight))
+                fontFamily = FontFamily(Font(miSansList[index], weight = fontWeight))
             )
         }
     }
@@ -195,7 +178,7 @@ fun DeviceFontTestView(text: String) {
 
 @Composable
 fun MoreTestText(text: String) {
-    val weightList = remember { fontWeightsList }
+    val weightList = fontWeightsList
 
     Row {
         weightList.forEach { fontWeight ->

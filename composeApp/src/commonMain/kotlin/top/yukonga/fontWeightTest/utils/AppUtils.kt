@@ -14,6 +14,23 @@ import fontweighttest.composeapp.generated.resources.misans_semibold
 import fontweighttest.composeapp.generated.resources.misans_thin
 
 @Stable
+data class FontDisplayState(
+    val customText: String = "",
+    val fontSizeValue: Int = 24,
+    val fontWeightValue: Int = 400
+) {
+    val effectiveFontSize = fontSizeValue.coerceIn(6, 96)
+    val effectiveFontWeight = getOptimizedFontWeight(fontWeightValue.coerceIn(1, 999))
+    val displayText = customText.ifEmpty { "永 の A 6" }
+}
+
+
+@Stable
+fun getOptimizedFontWeight(value: Int): FontWeight {
+    return commonFontWeights[value] ?: FontWeight(value.coerceIn(1, 1000))
+}
+
+@Stable
 val fontWeightsList = listOf(
     FontWeight.Thin, // W100
     FontWeight.ExtraLight, // W200
