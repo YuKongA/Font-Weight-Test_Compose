@@ -1,11 +1,11 @@
 [versions]
 android-gradle-plugin = "8.13.2"
-androidx-activity-compose = "1.12.1"
+androidx-activity-compose = "1.12.2"
 compose-plugin = "1.9.3"
 haze = "1.7.1"
 jna = "5.18.1"
 kotlin = "2.2.21"
-miuix = "0.7.1"
+miuix = "0.7.2"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }

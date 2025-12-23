@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FontWeightTest</string>
+    <string name="view_source">ソースを表示:</string>
+    <string name="join_group">グループに参加:</string>
+    <string name="opensource_info">Copyright © 2024 YuKongA</string>
+    <string name="home">ホーム</string>
+    <string name="sans_serif">ゴシック体</string>
+    <string name="serif">明朝体</string>
+    <string name="monospace">等幅</string>
+    <string name="comparison_display">フォントの太さ表示</string>
+    <string name="variable_font">バリアブルフォントテスト</string>
+    <string name="custom_text">カスタムテキスト</string>
+    <string name="clear_text">クリア</string>
+    <string name="device_font">デバイスフォント</string>
+    <string name="italic_font">イタリック体</string>
+    <string name="more_examples">その他の例</string>
+    <string name="font_weight">太さ</string>
+    <string name="font_size">サイズ</string>
+    <string name="about">アプリについて</string>
+</resources>

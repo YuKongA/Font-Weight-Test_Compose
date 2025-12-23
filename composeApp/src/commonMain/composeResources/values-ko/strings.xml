@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FontWeightTest</string>
+    <string name="view_source">소스 보기:</string>
+    <string name="join_group">그룹 가입:</string>
+    <string name="opensource_info">Copyright © 2024 YuKongA</string>
+    <string name="home">홈</string>
+    <string name="sans_serif">고딕</string>
+    <string name="serif">명조</string>
+    <string name="monospace">등폭</string>
+    <string name="comparison_display">폰트 굵기 표시</string>
+    <string name="variable_font">가변 폰트 테스트</string>
+    <string name="custom_text">사용자 지정 텍스트</string>
+    <string name="clear_text">지우기</string>
+    <string name="device_font">디바이스 폰트</string>
+    <string name="italic_font">이탤릭체</string>
+    <string name="more_examples">더 많은 예시</string>
+    <string name="font_weight">굵기</string>
+    <string name="font_size">크기</string>
+    <string name="about">정보</string>
+</resources>
