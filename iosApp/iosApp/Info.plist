@@ -17,7 +17,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.6.3</string>
 	<key>CFBundleVersion</key>
-	<string>158</string>
+	<string>160</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

@@ -48,6 +48,7 @@ import top.yukonga.fontWeightTest.utils.fontWeightDescriptions
 import top.yukonga.fontWeightTest.utils.fontWeightsList
 import top.yukonga.fontWeightTest.utils.miSansList
 import top.yukonga.fontWeightTest.utils.testCharacters
+import top.yukonga.fontWeightTest.utils.parseUnicodeNotationToText
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 import top.yukonga.miuix.kmp.basic.Slider
 import top.yukonga.miuix.kmp.basic.SmallTitle
@@ -275,7 +276,7 @@ fun SliderTestView() {
 
         CustomTextInput(
             value = customText,
-            onValueChange = { customText = it },
+            onValueChange = { customText = parseUnicodeNotationToText(it) },
             focusManager = focusManager
         )
 

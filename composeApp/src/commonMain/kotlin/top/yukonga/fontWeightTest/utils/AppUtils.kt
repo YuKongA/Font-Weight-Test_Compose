@@ -84,3 +84,24 @@ val fontWeightDescriptions = listOf(
 
 @Stable
 val testCharacters = listOf("永", "の", "한", "A", "6")
+
+@Stable
+fun parseUnicodeNotationToText(input: String): String {
+    val regex = Regex("""U\+([0-9a-fA-F]{1,6})""")
+    return regex.replace(input) { match ->
+        val hex = match.groupValues[1]
+        val cp = hex.toIntOrNull(16) ?: return@replace match.value
+        if (cp in 0..0x10FFFF && (cp !in 0xD800..0xDFFF)) {
+            if (cp <= 0xFFFF) {
+                cp.toChar().toString()
+            } else {
+                val u = cp - 0x10000
+                val high = 0xD800 + (u shr 10)
+                val low = 0xDC00 + (u and 0x3FF)
+                charArrayOf(high.toChar(), low.toChar()).concatToString()
+            }
+        } else {
+            match.value
+        }
+    }
+}
