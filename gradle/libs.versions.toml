@@ -1,14 +1,20 @@
 [versions]
 android-gradle-plugin = "8.13.2"
 androidx-activity-compose = "1.12.2"
-compose-plugin = "1.9.3"
+compose-plugin = "1.10.0-rc02"
 haze = "1.7.1"
 jna = "5.18.1"
 kotlin = "2.2.21"
-miuix = "0.7.2"
+miuix = "0.8.0-rc01"
+runtime = "1.10.0-rc02"
+ui = "1.10.0-rc02"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-plugin" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "ui" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }

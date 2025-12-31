@@ -83,4 +83,4 @@ val fontWeightDescriptions = listOf(
 )
 
 @Stable
-val testCharacters = listOf("永", "の", "A", "6")
+val testCharacters = listOf("永", "の", "한", "A", "6")
