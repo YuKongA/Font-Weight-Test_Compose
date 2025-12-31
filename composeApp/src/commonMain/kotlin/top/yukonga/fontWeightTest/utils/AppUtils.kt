@@ -21,7 +21,7 @@ data class FontDisplayState(
 ) {
     val effectiveFontSize = fontSizeValue.coerceIn(6, 96)
     val effectiveFontWeight = getOptimizedFontWeight(fontWeightValue.coerceIn(1, 999))
-    val displayText = customText.ifEmpty { "永 の A 6" }
+    val displayText = customText.ifEmpty { "永 の 한 A 6" }
 }
 
 
