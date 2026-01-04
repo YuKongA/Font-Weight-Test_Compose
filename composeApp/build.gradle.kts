@@ -58,9 +58,6 @@ kotlin {
             kotlin.srcDir(generatedSrcDir.resolve("kotlin").absolutePath)
         }
         commonMain.dependencies {
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.miuix)
             implementation(libs.haze)

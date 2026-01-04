@@ -172,6 +172,7 @@ private fun PagerContent(
     HorizontalPager(
         modifier = Modifier.hazeSource(state = hazeState),
         state = pagerState,
+        beyondViewportPageCount = 4,
         userScrollEnabled = false,
         pageContent = { page ->
             key(page) {
