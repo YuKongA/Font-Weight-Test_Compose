@@ -311,7 +311,6 @@ iosApp/Pods/*
 iosApp/iosApp.xcworkspace/*
 iosApp/iosApp.xcodeproj/*
 !iosApp/iosApp.xcodeproj/project.pbxproj
-composeApp/composeApp.podspec
 
 ### AndroidStudio ###
 # Covers files to be ignored for android development using Android Studio.
@@ -420,5 +419,8 @@ obj/
 ### AndroidStudio Patch ###
 
 !/gradle/wrapper/gradle-wrapper.jar
+
+# Add composeResources files
+/shared/src/commonMain/composeResources/files
 
 # End of https://www.toptal.com/developers/gitignore/api/java,linux,macos,kotlin,android,windows,composer,jetbrains,androidstudio,visualstudiocode,xcode
