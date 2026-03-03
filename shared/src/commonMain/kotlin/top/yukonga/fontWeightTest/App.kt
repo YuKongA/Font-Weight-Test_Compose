@@ -29,14 +29,17 @@ import fontweighttest.shared.generated.resources.home
 import fontweighttest.shared.generated.resources.monospace
 import fontweighttest.shared.generated.resources.sans_serif
 import fontweighttest.shared.generated.resources.serif
+import fontweighttest.shared.generated.resources.tune
+import fontweighttest.shared.generated.resources.unicode_nav
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import top.yukonga.fontWeightTest.ui.AboutDialog
-import top.yukonga.fontWeightTest.ui.HomeView
-import top.yukonga.fontWeightTest.ui.MonospaceView
-import top.yukonga.fontWeightTest.ui.SansSerifView
-import top.yukonga.fontWeightTest.ui.SerifView
+import top.yukonga.fontWeightTest.ui.HomePage
+import top.yukonga.fontWeightTest.ui.MonospacePage
+import top.yukonga.fontWeightTest.ui.SansSerifPage
+import top.yukonga.fontWeightTest.ui.SerifPage
+import top.yukonga.fontWeightTest.ui.UnicodeCoveragePage
 import top.yukonga.fontWeightTest.ui.theme.AppTheme
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.NavigationBar
@@ -59,9 +62,9 @@ fun App(
         isDarkTheme = isDarkTheme
     ) {
         val coroutineScope = rememberCoroutineScope()
-        val topAppBarScrollBehaviorList = List(4) { MiuixScrollBehavior() }
+        val topAppBarScrollBehaviorList = List(5) { MiuixScrollBehavior() }
 
-        val pagerState = rememberPagerState(pageCount = { 4 })
+        val pagerState = rememberPagerState(pageCount = { 5 })
 
         val currentScrollBehavior by remember {
             derivedStateOf { topAppBarScrollBehaviorList[pagerState.currentPage] }
@@ -78,6 +81,7 @@ fun App(
             NavigationItem(stringResource(Res.string.sans_serif), vectorResource(Res.drawable.sans_serif)),
             NavigationItem(stringResource(Res.string.serif), vectorResource(Res.drawable.serif)),
             NavigationItem(stringResource(Res.string.monospace), vectorResource(Res.drawable.monospace)),
+            NavigationItem(stringResource(Res.string.unicode_nav), vectorResource(Res.drawable.tune)),
         )
 
         val hazeState = remember { HazeState() }
@@ -179,15 +183,16 @@ private fun PagerContent(
     HorizontalPager(
         modifier = Modifier.hazeSource(state = hazeState),
         state = pagerState,
-        beyondViewportPageCount = 4,
+        beyondViewportPageCount = 5,
         userScrollEnabled = false,
         pageContent = { page ->
             key(page) {
                 when (page) {
-                    0 -> HomeView(topAppBarScrollBehaviorList[0], padding)
-                    1 -> SansSerifView(topAppBarScrollBehaviorList[1], padding)
-                    2 -> SerifView(topAppBarScrollBehaviorList[2], padding)
-                    3 -> MonospaceView(topAppBarScrollBehaviorList[3], padding)
+                    0 -> HomePage(topAppBarScrollBehaviorList[0], padding)
+                    1 -> SansSerifPage(topAppBarScrollBehaviorList[1], padding)
+                    2 -> SerifPage(topAppBarScrollBehaviorList[2], padding)
+                    3 -> MonospacePage(topAppBarScrollBehaviorList[3], padding)
+                    4 -> UnicodeCoveragePage(topAppBarScrollBehaviorList[4], padding)
                 }
             }
         }

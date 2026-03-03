@@ -53,6 +53,8 @@ jobs:
           java-version: "21"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
+      - name: Download Unicode coverage resources
+        run: ./gradlew :shared:downloadUnicodeCoverageData
       - name: Decode android signing key
         if: matrix.platformEx == 'android universal'
         run: echo ${{ secrets.SIGNING_KEY }} | base64 -d > keystore.jks
