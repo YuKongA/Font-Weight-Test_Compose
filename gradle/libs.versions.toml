@@ -1,14 +1,14 @@
 [versions]
-android-gradle-plugin = "8.13.2"
-androidx-activity-compose = "1.12.2"
-compose-plugin = "1.10.0-rc02"
-haze = "1.7.1"
+android-gradle-plugin = "9.0.1"
+androidx-activity-compose = "1.12.4"
+compose-plugin = "1.10.1"
+haze = "1.7.2"
 jna = "5.18.1"
-kotlin = "2.2.21"
-miuix = "0.8.0-rc04"
+kotlin = "2.3.10"
+miuix = "0.8.5"
 
 [libraries]
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
@@ -17,6 +17,7 @@ miuix = { module = "top.yukonga.miuix.kmp:miuix", version.ref = "miuix" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-gradle-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

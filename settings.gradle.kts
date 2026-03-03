@@ -1,5 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+rootProject.name = "FontWeightTest"
+
 pluginManagement {
     repositories {
         google {
@@ -29,15 +33,10 @@ dependencyResolutionManagement {
 
 plugins {
     id("com.android.settings") version ("8.13.2")
-    id("org.gradle.toolchains.foojay-resolver-convention") version ("1.0.0")
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-android {
-    compileSdk = 36
-    targetSdk = 36
-    minSdk = 26
-    buildToolsVersion = "36.1.0"
-}
-
-rootProject.name = "FontWeightTest"
-include(":composeApp")
+include(":shared")
+include(":android")
+include(":desktop")
+include(":macos")

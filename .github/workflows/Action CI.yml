@@ -1,107 +1,110 @@
-name: Action CI
+name: Build Example App
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-
-permissions:
-  contents: read
-  actions: write
+      - "README.md"
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [macos-latest, ubuntu-latest, ubuntu-24.04-arm, windows-latest]
         include:
-          - os: windows-latest
-            platform: windows x64
-            build-command: ./gradlew createReleaseDistributable
-            artifact-path: composeApp/build/compose/binaries/main-release/app/FontWeightTest
-            artifact-name: FontWeightTest-windows-x64-exe
-            jdk-distribution: jetbrains
           - os: macos-latest
             platform: macos arm64
             build-command: ./gradlew packageDmgNativeReleaseMacosArm64
-            artifact-path: composeApp/build/compose/binaries/main/native-macosArm64-release-dmg
-            artifact-name: FontWeightTest-darwin-arm64-dmg
-            jdk-distribution: zulu
+            artifact-path: macos/build/compose/binaries/main/native-macosArm64-release-dmg/*.dmg
+            artifact-name: FontWeightTest-darwin-arm64-dmg.dmg
+            archive: false
           - os: ubuntu-latest
             platform: linux x64
-            platformEx: android aarch64
+            platformEx: android universal
             build-command: ./gradlew createReleaseDistributable
             build-commandEx: ./gradlew assembleDebug && ./gradlew assembleRelease
-            artifact-path: composeApp/build/compose/binaries/main-release/app/FontWeightTest
-            artifact-pathEx: composeApp/build/outputs/apk/release
+            artifact-path: desktop/build/compose/binaries/main-release/app/FontWeightTest
+            artifact-pathEx: android/build/outputs/apk/release/*.apk
             artifact-name: FontWeightTest-linux-x64-bin
-            artifact-nameEx: FontWeightTest-android-aarch64-apk
-            jdk-distribution: zulu
-
+            artifact-nameEx: FontWeightTest-android-universal-apk.apk
+            archive: true
+          - os: ubuntu-24.04-arm
+            platform: linux arm64
+            build-command: ./gradlew createReleaseDistributable
+            artifact-path: desktop/build/compose/binaries/main-release/app/FontWeightTest
+            artifact-name: FontWeightTest-linux-arm64-bin
+            archive: true
+          - os: windows-latest
+            platform: windows x64
+            build-command: ./gradlew createReleaseDistributable
+            artifact-path: desktop/build/compose/binaries/main-release/app/FontWeightTest
+            artifact-name: FontWeightTest-windows-x64-exe
+            archive: true
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v4
+      - name: Checkout Sources
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: ${{ matrix.jdk-distribution }}
-          java-version: '21'
-
+          distribution: "zulu"
+          java-version: "21"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
+        uses: gradle/actions/setup-gradle@v5
       - name: Decode android signing key
-        if: matrix.platformEx == 'android aarch64'
+        if: matrix.platformEx == 'android universal'
         run: echo ${{ secrets.SIGNING_KEY }} | base64 -d > keystore.jks
-
       - name: Build ${{ matrix.platform }} platform
         run: ${{ matrix.build-command }}
-
       - name: Build ${{ matrix.platformEx }} platform
-        if: matrix.platformEx == 'android aarch64'
+        if: matrix.platformEx == 'android universal'
         run: ${{ matrix.build-commandEx }}
         env:
           KEYSTORE_PATH: "../keystore.jks"
           KEYSTORE_PASS: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
+      - name: Rename ${{ matrix.platform }} artifact
+        run: mv ${{ matrix.artifact-path }} ${{ matrix.artifact-name }}
+        shell: bash
+      - name: Rename ${{ matrix.platformEx }} artifact
+        if: matrix.platformEx == 'android universal'
+        run: mv ${{ matrix.artifact-pathEx }} ${{ matrix.artifact-nameEx }}
+        shell: bash
       - name: Upload FontWeightTest ${{ matrix.platform }} artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact-name }}
-          path: ${{ matrix.artifact-path }}
-          compression-level: 9
-
+          path: ${{ matrix.artifact-name }}
+          archive: ${{ matrix.archive }}
       - name: Upload FontWeightTest ${{ matrix.platformEx }} artifact
-        if: matrix.platformEx == 'android aarch64'
-        uses: actions/upload-artifact@v4
+        if: matrix.platformEx == 'android universal'
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact-nameEx }}
-          path: ${{ matrix.artifact-pathEx }}
-          compression-level: 9
+          path: ${{ matrix.artifact-nameEx }}
+          archive: false
+
+  post_telegram:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && github.ref_type != 'tag' }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
 
       - name: Post to Telegram ci channel
-        if: ${{ success() && matrix.platformEx == 'android aarch64' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && github.ref_type != 'tag' }}
         env:
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          COMMIT_MESSAGE: |+
-            New CI from FontWeightTest
-
-            ```
-            ${{ github.event.head_commit.message }}
-            ```
-        run: |
-          if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
-            export RELEASE=$(find ./composeApp/build/outputs/apk/release -name "*.apk")
-            export DEBUG=$(find ./composeApp/build/outputs/apk/debug -name "*.apk")
-            ESCAPED=`python3 -c 'import json,os,urllib.parse; print(urllib.parse.quote(json.dumps(os.environ["COMMIT_MESSAGE"])))'`
-            curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2Frelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2Fdebug%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22%3A${ESCAPED}%7D%5D" -F release="@$RELEASE" -F debug="@$DEBUG"
-          fi
+          BOT_API_LINK: ${{ secrets.BOT_API_LINK }}
+        run: bash .github/scripts/post_telegram.sh
