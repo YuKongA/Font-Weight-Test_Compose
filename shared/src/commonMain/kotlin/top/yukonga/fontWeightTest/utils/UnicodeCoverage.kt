@@ -7,13 +7,10 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.time.TimeSource
 
-private const val UNIHAN_IRG_SOURCES_PATH = "files/Unihan_IRGSources.txt"
 private const val SCRIPTS_PATH = "files/Scripts.txt"
 private const val SCRIPT_EXTENSIONS_PATH = "files/ScriptExtensions.txt"
 private const val UNICODE_DATA_PATH = "files/UnicodeData.txt"
 private const val UNICODE_BLOCKS_PATH = "files/Blocks.txt"
-private const val UNICODE_DRAFT_UNIHAN_ZIP_URL = "https://unicode.org/Public/draft/ucd/Unihan.zip"
-private const val UNICODE_VERSIONED_UNIHAN_ZIP_URL = "https://unicode.org/Public/17.0.0/ucd/Unihan.zip"
 private const val UNICODE_DRAFT_UCD_BASE_URL = "https://unicode.org/Public/draft/ucd"
 private const val UNICODE_VERSIONED_UCD_BASE_URL = "https://unicode.org/Public/17.0.0/ucd"
 private const val UNKNOWN_BLOCK_NAME = "Unknown"
@@ -184,34 +181,19 @@ private suspend fun loadHanScriptCodePoints(): IntArray {
     cachedHanScriptCodePoints?.let { return it }
     hanScriptsCacheMutex.withLock {
         cachedHanScriptCodePoints?.let { return it }
-        val scriptsTextResult = runCatching {
+        val scriptsText = runCatching {
             Res.readBytes(SCRIPTS_PATH).decodeToString()
+        }.getOrElse {
+            throw IllegalStateException(
+                "Missing $SCRIPTS_PATH. Run ./gradlew :shared:downloadUnicodeCoverageData -Poverwrite or manually download Scripts.txt from $UNICODE_DRAFT_UCD_BASE_URL (fallback: $UNICODE_VERSIONED_UCD_BASE_URL) to shared/src/commonMain/composeResources/files/."
+            )
         }
-        val scriptExtensionsTextResult = runCatching {
+        val scriptExtensionsText = runCatching {
             Res.readBytes(SCRIPT_EXTENSIONS_PATH).decodeToString()
-        }
-
-        val scriptsText = scriptsTextResult.getOrNull()
-        val scriptExtensionsText = scriptExtensionsTextResult.getOrNull()
-        if (scriptsText == null || scriptExtensionsText == null) {
-            val fallbackText = runCatching {
-                Res.readBytes(UNIHAN_IRG_SOURCES_PATH).decodeToString()
-            }.getOrElse {
-                throw IllegalStateException(
-                    "Missing Han source files. Prefer $SCRIPTS_PATH and $SCRIPT_EXTENSIONS_PATH (download from $UNICODE_DRAFT_UCD_BASE_URL with fallback $UNICODE_VERSIONED_UCD_BASE_URL). Fallback is $UNIHAN_IRG_SOURCES_PATH (from $UNICODE_DRAFT_UNIHAN_ZIP_URL, fallback $UNICODE_VERSIONED_UNIHAN_ZIP_URL)."
-                )
-            }
-            val fallbackSet = HashSet<Int>(100_000)
-            fallbackText.lineSequence().forEach { line ->
-                if (line.isBlank() || line.startsWith("#")) return@forEach
-                val parts = line.split('\t')
-                if (parts.size < 2 || !parts[0].startsWith("U+") || !parts[1].startsWith("kIRG_")) return@forEach
-                val cp = parts[0].removePrefix("U+").toIntOrNull(16) ?: return@forEach
-                fallbackSet.add(cp)
-            }
-            val fallbackResult = fallbackSet.toIntArray().sortedArray()
-            cachedHanScriptCodePoints = fallbackResult
-            return fallbackResult
+        }.getOrElse {
+            throw IllegalStateException(
+                "Missing $SCRIPT_EXTENSIONS_PATH. Run ./gradlew :shared:downloadUnicodeCoverageData -Poverwrite or manually download ScriptExtensions.txt from $UNICODE_DRAFT_UCD_BASE_URL (fallback: $UNICODE_VERSIONED_UCD_BASE_URL) to shared/src/commonMain/composeResources/files/."
+            )
         }
 
         val ranges = ArrayList<IntRange>()
