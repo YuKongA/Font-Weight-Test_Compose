@@ -18,4 +18,16 @@
     <string name="font_weight">字重</string>
     <string name="font_size">字号</string>
     <string name="about">关于</string>
+    <string name="unicode_coverage">Unicode 覆盖率</string>
+    <string name="unicode_nav">Unicode</string>
+    <string name="unicode_coverage_start">开始覆盖率检查</string>
+    <string name="unicode_coverage_running">正在检查覆盖率...</string>
+    <string name="unicode_coverage_progress">进度：%1$d / %2$d（%3$s%）</string>
+    <string name="unicode_coverage_supported">可显示字符：%1$d / %2$d（%3$s%）</string>
+    <string name="unicode_coverage_duration">耗时：%1$d 毫秒</string>
+    <string name="unicode_coverage_error">错误：%1$s</string>
+    <string name="unicode_coverage_overall">总体结果：%1$s - %2$d / %3$d（%4$s%）</string>
+    <string name="unicode_coverage_hide_perfect">隐藏 100% 区块</string>
+    <string name="unicode_coverage_blocks">区块结果</string>
+    <string name="unicode_coverage_block_result">%1$s：%2$s - %3$d / %4$d（%5$s%）</string>
 </resources>
