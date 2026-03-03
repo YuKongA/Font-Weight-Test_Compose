@@ -121,11 +121,6 @@ fun UnicodeCoverageView(
                         )
                     }
                 }
-                currentError?.let { message ->
-                    Text(
-                        text = stringResource(Res.string.unicode_coverage_error, message)
-                    )
-                }
             }
             if (currentDisplayChars.isNotEmpty()) {
                 Text(
@@ -138,6 +133,19 @@ fun UnicodeCoverageView(
                     lineHeight = 38.sp
                 )
             }
+        }
+    }
+
+    currentError?.let { message ->
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(all = 12.dp),
+            insideMargin = PaddingValues(16.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.unicode_coverage_error, message)
+            )
         }
     }
 
