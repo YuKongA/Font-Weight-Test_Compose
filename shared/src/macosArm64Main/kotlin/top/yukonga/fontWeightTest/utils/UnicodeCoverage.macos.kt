@@ -20,4 +20,12 @@ actual object UnicodeGlyphSupport {
         val cp = codePoint.toUInt()
         return characterSets.any { it.longCharacterIsMember(cp) }
     }
+
+    actual fun hasGlyphs(codePoints: IntArray): BooleanArray {
+        val results = BooleanArray(codePoints.size)
+        for (i in codePoints.indices) {
+            results[i] = hasGlyph(codePoints[i])
+        }
+        return results
+    }
 }

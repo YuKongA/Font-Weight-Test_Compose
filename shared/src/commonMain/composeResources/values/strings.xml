@@ -20,10 +20,12 @@
     <string name="about">About</string>
     <string name="unicode_coverage">Unicode coverage</string>
     <string name="unicode_nav">Unicode</string>
-    <string name="unicode_coverage_start">Start coverage check</string>
+    <string name="unicode_coverage_start">Coverage check</string>
     <string name="unicode_coverage_running">Checking coverage...</string>
     <string name="unicode_coverage_progress">Progress: %1$d / %2$d (%3$s%)</string>
+    <string name="unicode_coverage_current">Current：%1$d (U+%2$d)</string>
     <string name="unicode_coverage_supported">Supported characters: %1$d / %2$d (%3$s%)</string>
+    <string name="unicode_coverage_ratio">Ratio：%1$d / %2$d (%3$d)</string>
     <string name="unicode_coverage_duration">Elapsed time: %1$d ms</string>
     <string name="unicode_coverage_error">Error: %1$s</string>
     <string name="unicode_coverage_overall">Overall: %1$s - %2$d / %3$d (%4$s%)</string>

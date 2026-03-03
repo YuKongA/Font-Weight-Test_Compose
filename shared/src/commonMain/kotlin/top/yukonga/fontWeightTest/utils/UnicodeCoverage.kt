@@ -36,7 +36,9 @@ enum class UnicodeCoverageMode {
 data class UnicodeCoverageProgress(
     val processedCount: Int,
     val supportedCount: Int,
-    val totalCount: Int
+    val totalCount: Int,
+    val currentCodePoint: Int,
+    val currentChunk: IntArray = IntArray(0)
 ) {
     val percentage: Double
         get() = if (processedCount == 0) 0.0 else supportedCount.toDouble() / processedCount * 100
@@ -71,6 +73,7 @@ data class UnicodeCoverageBlockResult(
 
 expect object UnicodeGlyphSupport {
     fun hasGlyph(codePoint: Int): Boolean
+    fun hasGlyphs(codePoints: IntArray): BooleanArray
 }
 
 suspend fun measureUnicodeCoverage(
@@ -86,33 +89,40 @@ suspend fun measureUnicodeCoverage(
     val timeMark = TimeSource.Monotonic.markNow()
     var blockIndex = 0
 
-    for (codePoint in codePoints) {
-        while (blockIndex < blocks.size && codePoint > blocks[blockIndex].end) {
-            blockIndex++
-        }
-        val blockName = if (blockIndex < blocks.size && codePoint >= blocks[blockIndex].start) {
-            blocks[blockIndex].name
-        } else {
-            UNKNOWN_BLOCK_NAME
-        }
-        val blockStat = blockStats.getOrPut(blockName) { MutableBlockStatistics() }
+    val chunkSize = 4096
+    for (i in codePoints.indices step chunkSize) {
+        val end = minOf(i + chunkSize, codePoints.size)
+        val chunk = codePoints.sliceArray(i until end)
+        val glyphsSupported = UnicodeGlyphSupport.hasGlyphs(chunk)
 
-        val hasGlyph = UnicodeGlyphSupport.hasGlyph(codePoint)
-        if (hasGlyph) {
-            supported++
-            blockStat.supported++
+        for (j in chunk.indices) {
+            val codePoint = chunk[j]
+            while (blockIndex < blocks.size && codePoint > blocks[blockIndex].end) {
+                blockIndex++
+            }
+            val blockName = if (blockIndex < blocks.size && codePoint >= blocks[blockIndex].start) {
+                blocks[blockIndex].name
+            } else {
+                UNKNOWN_BLOCK_NAME
+            }
+            val blockStat = blockStats.getOrPut(blockName) { MutableBlockStatistics() }
+
+            if (glyphsSupported[j]) {
+                supported++
+                blockStat.supported++
+            }
+            blockStat.total++
+            processed++
         }
-        blockStat.total++
-        processed++
-        if (processed % PROGRESS_INTERVAL == 0) {
-            onProgress(
-                UnicodeCoverageProgress(
-                    processedCount = processed,
-                    supportedCount = supported,
-                    totalCount = total
-                )
+        onProgress(
+            UnicodeCoverageProgress(
+                processedCount = processed,
+                supportedCount = supported,
+                totalCount = total,
+                currentCodePoint = chunk.last(),
+                currentChunk = chunk
             )
-        }
+        )
     }
 
     val result = UnicodeCoverageResult(
@@ -133,7 +143,8 @@ suspend fun measureUnicodeCoverage(
         UnicodeCoverageProgress(
             processedCount = result.processedCount,
             supportedCount = result.supportedCount,
-            totalCount = result.totalCount
+            totalCount = result.totalCount,
+            currentCodePoint = 0
         )
     )
     result
@@ -216,43 +227,125 @@ private suspend fun loadUnicodeDataCodePoints(): IntArray {
     cachedUnicodeDataCodePoints?.let { return it }
     unicodeDataCacheMutex.withLock {
         cachedUnicodeDataCodePoints?.let { return it }
-        val text = runCatching {
-            Res.readBytes(UNICODE_DATA_PATH).decodeToString()
+        val bytes = runCatching {
+            Res.readBytes(UNICODE_DATA_PATH)
         }.getOrElse {
             throw IllegalStateException(
                 "Missing $UNICODE_DATA_PATH. Run ./gradlew :shared:downloadUnicodeCoverageData -Poverwrite or manually download UnicodeData.txt from $UNICODE_DRAFT_UCD_BASE_URL (fallback: $UNICODE_VERSIONED_UCD_BASE_URL) to shared/src/commonMain/composeResources/files/."
             )
         }
         val list = ArrayList<Int>(300_000)
-        text.lineSequence().forEach { line ->
-            if (line.isBlank() || line.startsWith("#")) {
-                return@forEach
+        var pendingRangeStart = -1
+
+        var i = 0
+        val n = bytes.size
+        while (i < n) {
+            val lineStart = i
+            // Find line end
+            while (i < n && bytes[i] != 0x0A.toByte()) {
+                i++
             }
-            val fields = line.split(';')
-            if (fields.size < 3) return@forEach
-            val codePointHex = fields[0].trim()
-            val name = fields[1].trim()
-            val category = fields[2].trim()
-            if (unicodeFilterCategories.contains(category)) return@forEach
-            val codePoint = codePointHex.toIntOrNull(16) ?: return@forEach
-            if (name.startsWith("<") && name.endsWith("First>")) {
-                list.add(-codePoint - 1)
-                return@forEach
+            val lineEnd = i
+            i++ // Skip \n
+
+            // Handle empty lines or comments
+            if (lineEnd == lineStart || bytes[lineStart] == '#'.code.toByte()) continue
+
+            // Process fields
+            var current = lineStart
+
+            // Field 0: Code Point
+            val f0Start = current
+            while (current < lineEnd && bytes[current] != ';'.code.toByte()) current++
+            val f0End = current
+            if (current >= lineEnd) continue // Invalid line
+            val codePoint = parseHex(bytes, f0Start, f0End)
+            current++ // Skip ;
+
+            // Field 1: Name
+            val f1Start = current
+            while (current < lineEnd && bytes[current] != ';'.code.toByte()) current++
+            val f1End = current
+            if (current >= lineEnd) continue
+            // Check for <... First> or <... Last>
+            val isFirst = isRangeStart(bytes, f1Start, f1End)
+            val isLast = isRangeEnd(bytes, f1Start, f1End)
+            current++ // Skip ;
+
+            // Field 2: Category
+            val f2Start = current
+            while (current < lineEnd && bytes[current] != ';'.code.toByte()) current++
+            val f2End = current
+            // Category check
+            val isFiltered = isFilteredCategory(bytes, f2Start, f2End)
+
+            if (isFirst) {
+                pendingRangeStart = if (isFiltered) -2 else codePoint
+                continue
             }
-            if (name.startsWith("<") && name.endsWith("Last>")) {
-                val startMarker = list.removeLastOrNull() ?: return@forEach
-                if (startMarker >= 0) return@forEach
-                val start = -startMarker - 1
-                for (cp in start..codePoint) {
-                    list.add(cp)
+
+            if (isLast) {
+                if (pendingRangeStart >= 0) {
+                    for (cp in pendingRangeStart..codePoint) {
+                        list.add(cp)
+                    }
                 }
-                return@forEach
+                pendingRangeStart = -1
+                continue
             }
+
+            if (isFiltered) continue
             list.add(codePoint)
         }
         val result = list.distinct().sorted().toIntArray()
         cachedUnicodeDataCodePoints = result
         return result
+    }
+}
+
+private fun parseHex(bytes: ByteArray, start: Int, end: Int): Int {
+    var value = 0
+    for (i in start until end) {
+        val b = bytes[i].toInt()
+        val digit = when (b) {
+            in '0'.code..'9'.code -> b - '0'.code
+            in 'A'.code..'F'.code -> b - 'A'.code + 10
+            in 'a'.code..'f'.code -> b - 'a'.code + 10
+            else -> 0
+        }
+        value = (value shl 4) or digit
+    }
+    return value
+}
+
+private fun isRangeStart(bytes: ByteArray, start: Int, end: Int): Boolean {
+    val suffix = "First>"
+    if (end - start < suffix.length) return false
+    for (i in suffix.indices) {
+        if (bytes[end - suffix.length + i] != suffix[i].code.toByte()) return false
+    }
+    return bytes[start] == '<'.code.toByte()
+}
+
+private fun isRangeEnd(bytes: ByteArray, start: Int, end: Int): Boolean {
+    val suffix = "Last>"
+    if (end - start < suffix.length) return false
+    for (i in suffix.indices) {
+        if (bytes[end - suffix.length + i] != suffix[i].code.toByte()) return false
+    }
+    return bytes[start] == '<'.code.toByte()
+}
+
+private fun isFilteredCategory(bytes: ByteArray, start: Int, end: Int): Boolean {
+    if (end - start != 2) return false
+    val b1 = bytes[start].toInt().toChar()
+    val b2 = bytes[start + 1].toInt().toChar()
+    // "Cc", "Cf", "Co", "Zs", "Zl", "Zp", "Mn", "Cs", "Cn"
+    return when (b1) {
+        'C' -> b2 == 'c' || b2 == 'f' || b2 == 'o' || b2 == 's' || b2 == 'n'
+        'Z' -> b2 == 's' || b2 == 'l' || b2 == 'p'
+        'M' -> b2 == 'n'
+        else -> false
     }
 }
 
