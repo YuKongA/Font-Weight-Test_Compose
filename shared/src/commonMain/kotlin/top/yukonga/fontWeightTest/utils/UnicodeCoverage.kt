@@ -18,9 +18,11 @@ private const val UNKNOWN_BLOCK_NAME = "Unknown"
 private var cachedHanScriptCodePoints: IntArray? = null
 private var cachedUnicodeDataCodePoints: IntArray? = null
 private var cachedUnicodeBlocks: List<UnicodeBlock>? = null
+private var cachedUnicodeVersionMetadata: UnicodeVersionMetadata? = null
 private val hanScriptsCacheMutex = Mutex()
 private val unicodeDataCacheMutex = Mutex()
 private val unicodeBlocksCacheMutex = Mutex()
+private val unicodeVersionMetadataCacheMutex = Mutex()
 
 enum class UnicodeCoverageMode {
     UNIHAN,
@@ -70,7 +72,8 @@ data class UnicodeCoverageResult(
     val supportedCount: Int,
     val totalCount: Int,
     val durationMillis: Long,
-    val blockResults: List<UnicodeCoverageBlockResult>
+    val blockResults: List<UnicodeCoverageBlockResult>,
+    val unicodeVersionMetadata: UnicodeVersionMetadata?
 ) {
     val percentage: Double
         get() = if (processedCount == 0) 0.0 else supportedCount.toDouble() / processedCount * 100
@@ -102,6 +105,7 @@ suspend fun measureUnicodeCoverage(
 ): UnicodeCoverageResult = withContext(Dispatchers.Default) {
     val codePoints = loadCodePoints(mode)
     val blocks = loadUnicodeBlocks()
+    val unicodeVersionMetadata = loadUnicodeVersionMetadata()
     val blockStats = LinkedHashMap<String, MutableBlockStatistics>()
     var processed = 0
     var supported = 0
@@ -151,6 +155,7 @@ suspend fun measureUnicodeCoverage(
         supportedCount = supported,
         totalCount = total,
         durationMillis = timeMark.elapsedNow().inWholeMilliseconds,
+        unicodeVersionMetadata = unicodeVersionMetadata,
         blockResults = blockStats.map { (name, value) ->
             UnicodeCoverageBlockResult(
                 blockName = name,
@@ -195,6 +200,12 @@ private suspend fun loadHanScriptCodePoints(): IntArray {
                 "Missing $SCRIPT_EXTENSIONS_PATH. Run ./gradlew :shared:downloadUnicodeCoverageData -Poverwrite or manually download ScriptExtensions.txt from $UNICODE_DRAFT_UCD_BASE_URL (fallback: $UNICODE_VERSIONED_UCD_BASE_URL) to shared/src/commonMain/composeResources/files/."
             )
         }
+        if (cachedUnicodeVersionMetadata == null) {
+            cachedUnicodeVersionMetadata = mergeUnicodeVersionMetadata(
+                parseUnicodeVersionMetadata(scriptsText, "Scripts"),
+                parseUnicodeVersionMetadata(scriptExtensionsText, "ScriptExtensions")
+            )
+        }
 
         val ranges = ArrayList<IntRange>()
         scriptsText.lineSequence().forEach { line ->
@@ -225,6 +236,25 @@ private suspend fun loadHanScriptCodePoints(): IntArray {
         val result = resultList.toIntArray()
         cachedHanScriptCodePoints = result
         return result
+    }
+}
+
+private suspend fun loadUnicodeVersionMetadata(): UnicodeVersionMetadata? {
+    cachedUnicodeVersionMetadata?.let { return it }
+    return unicodeVersionMetadataCacheMutex.withLock {
+        cachedUnicodeVersionMetadata?.let { return it }
+        val scriptsText = runCatching {
+            Res.readBytes(SCRIPTS_PATH).decodeToString()
+        }.getOrNull()
+        val scriptExtensionsText = runCatching {
+            Res.readBytes(SCRIPT_EXTENSIONS_PATH).decodeToString()
+        }.getOrNull()
+        val metadata = mergeUnicodeVersionMetadata(
+            scriptsText?.let { parseUnicodeVersionMetadata(it, "Scripts") },
+            scriptExtensionsText?.let { parseUnicodeVersionMetadata(it, "ScriptExtensions") }
+        )
+        cachedUnicodeVersionMetadata = metadata
+        metadata
     }
 }
 
@@ -396,10 +426,49 @@ private data class UnicodeBlock(
     val name: String
 )
 
+data class UnicodeVersionMetadata(
+    val version: String,
+    val date: String
+)
+
 private data class MutableBlockStatistics(
     var supported: Int = 0,
     var total: Int = 0
 )
+
+private fun parseUnicodeVersionMetadata(text: String, filePrefix: String): UnicodeVersionMetadata? {
+    var version: String? = null
+    var date: String? = null
+    val versionRegex = Regex("""^#\s*$filePrefix-([0-9]+(?:\.[0-9]+){2})\.txt$""")
+    val dateRegex = Regex("""^#\s*Date:\s*(.+)$""")
+    text.lineSequence().forEach { line ->
+        if (version == null) {
+            val match = versionRegex.find(line.trim())
+            if (match != null) {
+                version = match.groupValues[1]
+            }
+        }
+        if (date == null) {
+            val match = dateRegex.find(line.trim())
+            if (match != null) {
+                date = match.groupValues[1].trim()
+            }
+        }
+        if (version != null && date != null) {
+            return UnicodeVersionMetadata(version = version, date = date)
+        }
+    }
+    return null
+}
+
+private fun mergeUnicodeVersionMetadata(
+    scripts: UnicodeVersionMetadata?,
+    scriptExtensions: UnicodeVersionMetadata?
+): UnicodeVersionMetadata? {
+    val version = scripts?.version ?: scriptExtensions?.version ?: return null
+    val date = scripts?.date ?: scriptExtensions?.date ?: return null
+    return UnicodeVersionMetadata(version = version, date = date)
+}
 
 private fun parseCodeRange(rangeText: String): IntRange? {
     val bounds = rangeText.split("..")

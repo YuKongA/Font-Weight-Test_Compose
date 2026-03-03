@@ -30,6 +30,7 @@ import fontweighttest.shared.generated.resources.unicode_coverage_progress
 import fontweighttest.shared.generated.resources.unicode_coverage_ratio
 import fontweighttest.shared.generated.resources.unicode_coverage_running
 import fontweighttest.shared.generated.resources.unicode_coverage_start
+import fontweighttest.shared.generated.resources.unicode_coverage_version
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.fontWeightTest.ui.viewmodel.UnicodeCoverageViewModel
 import top.yukonga.fontWeightTest.utils.UnicodeCoverageMode
@@ -165,6 +166,15 @@ fun UnicodeCoverageView(
                     color = getGradeColor(completed.grade),
                     fontWeight = FontWeight.SemiBold
                 )
+                completed.unicodeVersionMetadata?.let { metadata ->
+                    Text(
+                        text = stringResource(
+                            Res.string.unicode_coverage_version,
+                            metadata.version,
+                            metadata.date
+                        )
+                    )
+                }
                 Text(
                     stringResource(
                         Res.string.unicode_coverage_ratio,

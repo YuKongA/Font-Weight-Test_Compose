@@ -24,6 +24,7 @@
     <string name="unicode_coverage_running">正在檢查覆蓋率...</string>
     <string name="unicode_coverage_progress">進度：%1$d / %2$d (%3$s%)</string>
     <string name="unicode_coverage_current">目前：%1$s (U+%2$s)</string> 
+    <string name="unicode_coverage_version">版本：%1$s (%2$s)</string>
     <string name="unicode_coverage_ratio">比率：%1$d / %2$d (%3$s%)</string>
     <string name="unicode_coverage_duration">耗時：%1$d 毫秒</string>
     <string name="unicode_coverage_error">錯誤：%1$s</string>
