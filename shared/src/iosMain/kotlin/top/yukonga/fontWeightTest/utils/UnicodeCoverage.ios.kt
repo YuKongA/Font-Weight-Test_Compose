@@ -2,10 +2,16 @@ package top.yukonga.fontWeightTest.utils
 
 actual object UnicodeGlyphSupport {
     actual fun hasGlyph(codePoint: Int): Boolean {
-        TODO("Not yet implemented")
+        // iOS implementation currently does not perform real glyph detection.
+        // Return a conservative value to avoid runtime crashes and effectively
+        // disable Unicode coverage on iOS.
+        return false
     }
 
     actual fun hasGlyphs(codePoints: IntArray): BooleanArray {
-        TODO("Not yet implemented")
+        // Evaluate each code point using the single-glyph check.
+        return BooleanArray(codePoints.size) { index ->
+            hasGlyph(codePoints[index])
+        }
     }
 }
