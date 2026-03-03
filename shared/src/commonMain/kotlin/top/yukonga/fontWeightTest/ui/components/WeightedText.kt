@@ -13,7 +13,7 @@ fun WeightTextView(
     fontFamily: FontFamily = FontFamily.Default
 ) {
     val text = "伤仲永 にほんご 한국어 AaBbCc 123"
-    val labels = fontWeightsList.mapIndexed { index, _ ->
+    val labels = List(fontWeightsList.size) { index ->
         "${(index + 1) * 100} - $text"
     }
 
