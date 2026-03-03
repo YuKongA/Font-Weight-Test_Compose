@@ -10,10 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fontweighttest.shared.generated.resources.Res
 import fontweighttest.shared.generated.resources.unicode_coverage
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.fontWeightTest.ui.components.UnicodeCoverageView
+import top.yukonga.fontWeightTest.ui.viewmodel.UnicodeCoverageViewModel
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 import top.yukonga.miuix.kmp.basic.SmallTitle
 import top.yukonga.miuix.kmp.utils.overScrollVertical
@@ -22,7 +24,8 @@ import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 @Composable
 fun UnicodeCoveragePage(
     topAppBarScrollBehavior: ScrollBehavior,
-    padding: PaddingValues
+    padding: PaddingValues,
+    viewModel: UnicodeCoverageViewModel = viewModel { UnicodeCoverageViewModel() }
 ) {
     val layoutDirection = LocalLayoutDirection.current
     LazyColumn(
@@ -42,7 +45,7 @@ fun UnicodeCoveragePage(
             SmallTitle(text = stringResource(Res.string.unicode_coverage))
         }
         item(key = "unicode_coverage") {
-            UnicodeCoverageView()
+            UnicodeCoverageView(viewModel)
         }
     }
 }

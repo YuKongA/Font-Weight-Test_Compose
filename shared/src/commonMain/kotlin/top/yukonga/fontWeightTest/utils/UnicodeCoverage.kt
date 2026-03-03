@@ -7,7 +7,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.time.TimeSource
 
-private const val PROGRESS_INTERVAL = 2048
 private const val UNIHAN_IRG_SOURCES_PATH = "files/Unihan_IRGSources.txt"
 private const val SCRIPTS_PATH = "files/Scripts.txt"
 private const val SCRIPT_EXTENSIONS_PATH = "files/ScriptExtensions.txt"
@@ -18,8 +17,6 @@ private const val UNICODE_VERSIONED_UNIHAN_ZIP_URL = "https://unicode.org/Public
 private const val UNICODE_DRAFT_UCD_BASE_URL = "https://unicode.org/Public/draft/ucd"
 private const val UNICODE_VERSIONED_UCD_BASE_URL = "https://unicode.org/Public/17.0.0/ucd"
 private const val UNKNOWN_BLOCK_NAME = "Unknown"
-
-private val unicodeFilterCategories = setOf("Cc", "Cf", "Co", "Zs", "Zl", "Zp", "Mn", "Cs", "Cn")
 
 private var cachedHanScriptCodePoints: IntArray? = null
 private var cachedUnicodeDataCodePoints: IntArray? = null
@@ -42,6 +39,32 @@ data class UnicodeCoverageProgress(
 ) {
     val percentage: Double
         get() = if (processedCount == 0) 0.0 else supportedCount.toDouble() / processedCount * 100
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as UnicodeCoverageProgress
+
+        if (processedCount != other.processedCount) return false
+        if (supportedCount != other.supportedCount) return false
+        if (totalCount != other.totalCount) return false
+        if (currentCodePoint != other.currentCodePoint) return false
+        if (!currentChunk.contentEquals(other.currentChunk)) return false
+        if (percentage != other.percentage) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = processedCount
+        result = 31 * result + supportedCount
+        result = 31 * result + totalCount
+        result = 31 * result + currentCodePoint
+        result = 31 * result + currentChunk.contentHashCode()
+        result = 31 * result + percentage.hashCode()
+        return result
+    }
 }
 
 data class UnicodeCoverageResult(
@@ -306,8 +329,7 @@ private suspend fun loadUnicodeDataCodePoints(): IntArray {
 private fun parseHex(bytes: ByteArray, start: Int, end: Int): Int {
     var value = 0
     for (i in start until end) {
-        val b = bytes[i].toInt()
-        val digit = when (b) {
+        val digit = when (val b = bytes[i].toInt()) {
             in '0'.code..'9'.code -> b - '0'.code
             in 'A'.code..'F'.code -> b - 'A'.code + 10
             in 'a'.code..'f'.code -> b - 'a'.code + 10

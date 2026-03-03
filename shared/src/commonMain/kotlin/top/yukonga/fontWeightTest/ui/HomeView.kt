@@ -16,13 +16,8 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -33,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fontweighttest.shared.generated.resources.MiSansVF
 import fontweighttest.shared.generated.resources.Res
 import fontweighttest.shared.generated.resources.clear_text
@@ -45,10 +41,9 @@ import fontweighttest.shared.generated.resources.variable_font
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.fontWeightTest.ui.components.CardView
-import top.yukonga.fontWeightTest.utils.FontDisplayState
+import top.yukonga.fontWeightTest.ui.viewmodel.HomeViewModel
 import top.yukonga.fontWeightTest.utils.fontWeightDescriptions
 import top.yukonga.fontWeightTest.utils.fontWeightsList
-import top.yukonga.fontWeightTest.utils.parseUnicodeNotationToText
 import top.yukonga.fontWeightTest.utils.testCharacters
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 import top.yukonga.miuix.kmp.basic.Slider
@@ -61,7 +56,8 @@ import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 @Composable
 fun HomePage(
     topAppBarScrollBehavior: ScrollBehavior,
-    padding: PaddingValues
+    padding: PaddingValues,
+    viewModel: HomeViewModel = viewModel { HomeViewModel() }
 ) {
     val focusManager = LocalFocusManager.current
     val layoutDirection = LocalLayoutDirection.current
@@ -84,11 +80,11 @@ fun HomePage(
             bottom = padding.calculateBottomPadding() + 12.dp
         ),
     ) {
-        homeContent()
+        homeContent(viewModel)
     }
 }
 
-private fun LazyListScope.homeContent() {
+private fun LazyListScope.homeContent(viewModel: HomeViewModel) {
     item(key = "all_weights") {
         CardView {
             AllWeightText()
@@ -117,7 +113,7 @@ private fun LazyListScope.homeContent() {
 
     item(key = "variable_font") {
         CardView {
-            SliderTestView()
+            SliderTestView(viewModel)
         }
     }
 }
@@ -194,62 +190,11 @@ fun MoreTestText(text: String) {
 }
 
 @Composable
-fun SliderTestView() {
-    var customText by rememberSaveable { mutableStateOf("") }
-    var fontSizeValue by rememberSaveable { mutableIntStateOf(24) }
-    var fontSizeText by rememberSaveable { mutableStateOf(fontSizeValue.toString()) }
-    var fontWeightValue by rememberSaveable { mutableIntStateOf(400) }
-    var fontWeightText by rememberSaveable { mutableStateOf(fontWeightValue.toString()) }
-
-    val fontDisplayState by remember(customText, fontSizeValue, fontWeightValue) {
-        derivedStateOf {
-            FontDisplayState(
-                customText = customText,
-                fontSizeValue = fontSizeValue,
-                fontWeightValue = fontWeightValue
-            )
-        }
-    }
-
+fun SliderTestView(
+    viewModel: HomeViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
     val focusManager = LocalFocusManager.current
-
-    val onFontWeightTextChange = remember {
-        { newValue: String ->
-            if (newValue.isEmpty()) {
-                fontWeightValue = 1
-                fontWeightText = ""
-            } else if (newValue.all { it.isDigit() }) {
-                fontWeightValue = newValue.toInt().coerceIn(1, 1000)
-                fontWeightText = fontWeightValue.toString()
-            }
-        }
-    }
-
-    val onFontWeightSliderChange = remember {
-        { newValue: Float ->
-            fontWeightValue = newValue.toInt()
-            fontWeightText = newValue.toInt().toString()
-        }
-    }
-
-    val onFontSizeTextChange = remember {
-        { newValue: String ->
-            if (newValue.isEmpty()) {
-                fontSizeValue = 1
-                fontSizeText = ""
-            } else if (newValue.all { it.isDigit() }) {
-                fontSizeValue = newValue.toInt().coerceIn(1, 96)
-                fontSizeText = fontSizeValue.toString()
-            }
-        }
-    }
-
-    val onFontSizeSliderChange = remember {
-        { newValue: Float ->
-            fontSizeValue = newValue.toInt()
-            fontSizeText = newValue.toInt().toString()
-        }
-    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -259,34 +204,34 @@ fun SliderTestView() {
         ) {
             FontWeightControl(
                 modifier = Modifier.weight(0.5f),
-                value = fontWeightText,
-                onValueChange = onFontWeightTextChange,
-                sliderValue = fontWeightValue.toFloat(),
-                onSliderChange = onFontWeightSliderChange,
+                value = uiState.fontWeightText,
+                onValueChange = viewModel::updateFontWeightText,
+                sliderValue = uiState.fontWeightValue.toFloat(),
+                onSliderChange = viewModel::updateFontWeightSlider,
                 focusManager = focusManager
             )
 
             FontSizeControl(
                 modifier = Modifier.weight(0.5f),
-                value = fontSizeText,
-                onValueChange = onFontSizeTextChange,
-                sliderValue = fontSizeValue.toFloat(),
-                onSliderChange = onFontSizeSliderChange,
+                value = uiState.fontSizeText,
+                onValueChange = viewModel::updateFontSizeText,
+                sliderValue = uiState.fontSizeValue.toFloat(),
+                onSliderChange = viewModel::updateFontSizeSlider,
                 focusManager = focusManager
             )
         }
 
         CustomTextInput(
-            value = customText,
-            onValueChange = { customText = parseUnicodeNotationToText(it) },
+            value = uiState.customText,
+            onValueChange = viewModel::updateCustomText,
             focusManager = focusManager
         )
 
         Text(
             modifier = Modifier.padding(top = 12.dp),
-            text = fontDisplayState.displayText,
-            fontSize = fontDisplayState.effectiveFontSize.sp,
-            fontWeight = fontDisplayState.effectiveFontWeight,
+            text = uiState.fontDisplayState.displayText,
+            fontSize = uiState.fontDisplayState.effectiveFontSize.sp,
+            fontWeight = uiState.fontDisplayState.effectiveFontWeight,
         )
     }
 }
@@ -307,7 +252,7 @@ private fun FontWeightControl(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = stringResource(Res.string.font_weight),
+            label = "400",
             useLabelAsPlaceholder = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
@@ -343,7 +288,7 @@ private fun FontSizeControl(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = stringResource(Res.string.font_size),
+            label = "24",
             useLabelAsPlaceholder = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
@@ -372,7 +317,7 @@ private fun CustomTextInput(
     TextField(
         value = value,
         onValueChange = onValueChange,
-        label = stringResource(Res.string.custom_text),
+        label = "永 の 한 A 6",
         useLabelAsPlaceholder = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),

@@ -10,13 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,13 +30,10 @@ import fontweighttest.shared.generated.resources.unicode_coverage_progress
 import fontweighttest.shared.generated.resources.unicode_coverage_ratio
 import fontweighttest.shared.generated.resources.unicode_coverage_running
 import fontweighttest.shared.generated.resources.unicode_coverage_start
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import top.yukonga.fontWeightTest.ui.viewmodel.UnicodeCoverageViewModel
 import top.yukonga.fontWeightTest.utils.UnicodeCoverageMode
-import top.yukonga.fontWeightTest.utils.UnicodeCoverageProgress
-import top.yukonga.fontWeightTest.utils.UnicodeCoverageResult
 import top.yukonga.fontWeightTest.utils.convertCodePointToString
-import top.yukonga.fontWeightTest.utils.measureUnicodeCoverage
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.SmallTitle
@@ -52,48 +44,16 @@ import top.yukonga.miuix.kmp.extra.SuperCheckbox
 import kotlin.math.roundToInt
 
 @Composable
-fun UnicodeCoverageView() {
-    val coroutineScope = rememberCoroutineScope()
-    var isRunning by remember { mutableStateOf(false) }
-    var hidePerfectBlocks by remember { mutableStateOf(false) }
-    var mode by remember { mutableStateOf(UnicodeCoverageMode.UNIHAN) }
+fun UnicodeCoverageView(
+    viewModel: UnicodeCoverageViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
     val modeTabs = listOf("UNIHAN", "UNICODE")
 
-    val progressState = remember {
-        mutableStateMapOf(
-            UnicodeCoverageMode.UNIHAN to UnicodeCoverageProgress(0, 0, 1, 0),
-            UnicodeCoverageMode.UNICODE to UnicodeCoverageProgress(0, 0, 1, 0)
-        )
-    }
-    val resultState = remember { mutableStateMapOf<UnicodeCoverageMode, UnicodeCoverageResult?>() }
-    val errorState = remember { mutableStateMapOf<UnicodeCoverageMode, String?>() }
-    val displayCharsState = remember { mutableStateMapOf<UnicodeCoverageMode, String>() }
-
-    val currentProgress = progressState[mode]!!
-    val currentResult = resultState[mode]
-    val currentError = errorState[mode]
-    val currentDisplayChars = displayCharsState[mode] ?: ""
-
-    LaunchedEffect(currentProgress.currentChunk) {
-        if (currentProgress.currentChunk.isNotEmpty()) {
-            val chunk = currentProgress.currentChunk
-            val start = maxOf(0, chunk.size - 128)
-            val relevantChunk = chunk.sliceArray(start until chunk.size)
-            val sb = StringBuilder()
-            for (i in relevantChunk.indices.reversed()) {
-                sb.append(convertCodePointToString(relevantChunk[i]))
-            }
-            val newChars = sb.toString()
-            val current = displayCharsState[mode] ?: ""
-            val combined = newChars + current
-            val codePoints = combined.codePointCount()
-            if (codePoints > 128) {
-                displayCharsState[mode] = combined.takeCodePoints(128)
-            } else {
-                displayCharsState[mode] = combined
-            }
-        }
-    }
+    val currentProgress = uiState.progress[uiState.mode]!!
+    val currentResult = uiState.results[uiState.mode]
+    val currentError = uiState.errors[uiState.mode]
+    val currentDisplayChars = uiState.displayChars[uiState.mode] ?: ""
 
     Column(
         modifier = Modifier
@@ -103,49 +63,22 @@ fun UnicodeCoverageView() {
     ) {
         TabRow(
             tabs = modeTabs,
-            selectedTabIndex = if (mode == UnicodeCoverageMode.UNIHAN) 0 else 1,
+            selectedTabIndex = if (uiState.mode == UnicodeCoverageMode.UNIHAN) 0 else 1,
             onTabSelected = { selectedIndex ->
-                if (!isRunning) {
-                    mode = if (selectedIndex == 0) {
-                        UnicodeCoverageMode.UNIHAN
-                    } else {
-                        UnicodeCoverageMode.UNICODE
-                    }
+                if (!uiState.isRunning) {
+                    viewModel.updateMode(if (selectedIndex == 0) UnicodeCoverageMode.UNIHAN else UnicodeCoverageMode.UNICODE)
                 }
             }
         )
 
         TextButton(
-            text = if (isRunning) {
+            text = if (uiState.isRunning) {
                 stringResource(Res.string.unicode_coverage_running)
             } else {
                 stringResource(Res.string.unicode_coverage_start)
             },
-            enabled = !isRunning,
-            onClick = {
-                coroutineScope.launch {
-                    isRunning = true
-                    resultState[mode] = null
-                    errorState[mode] = null
-                    displayCharsState[mode] = ""
-                    progressState[mode] = UnicodeCoverageProgress(
-                        processedCount = 0,
-                        supportedCount = 0,
-                        totalCount = 1,
-                        currentCodePoint = 0
-                    )
-                    runCatching {
-                        measureUnicodeCoverage(mode) { current ->
-                            progressState[mode] = current
-                        }
-                    }.onSuccess { completed ->
-                        resultState[mode] = completed
-                    }.onFailure { throwable ->
-                        errorState[mode] = throwable.message ?: throwable.toString()
-                    }
-                    isRunning = false
-                }
-            },
+            enabled = !uiState.isRunning,
+            onClick = viewModel::startCoverage,
             colors = ButtonDefaults.textButtonColorsPrimary(),
             modifier = Modifier
                 .fillMaxWidth()
@@ -211,7 +144,7 @@ fun UnicodeCoverageView() {
         val finalPercent = formatPercentValue(completed.percentage)
         val visibleBlocks = completed.blockResults
             .filter { block ->
-                !(hidePerfectBlocks && block.supportedCount == block.totalCount)
+                !(uiState.hidePerfectBlocks && block.supportedCount == block.totalCount)
             }
             .sortedByDescending { it.percentage }
 
@@ -255,8 +188,8 @@ fun UnicodeCoverageView() {
         ) {
             SuperCheckbox(
                 title = stringResource(Res.string.unicode_coverage_hide_perfect),
-                checked = hidePerfectBlocks,
-                onCheckedChange = { hidePerfectBlocks = it },
+                checked = uiState.hidePerfectBlocks,
+                onCheckedChange = viewModel::toggleHidePerfectBlocks,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -312,36 +245,6 @@ private fun formatPercentValue(value: Double): String {
     val whole = scaled / 100
     val fraction = (scaled % 100).toString().padStart(2, '0')
     return "$whole.$fraction"
-}
-
-private fun String.codePointCount(): Int {
-    var count = 0
-    var i = 0
-    while (i < length) {
-        val c = this[i]
-        if (c.isHighSurrogate() && i + 1 < length && this[i + 1].isLowSurrogate()) {
-            i += 2
-        } else {
-            i++
-        }
-        count++
-    }
-    return count
-}
-
-private fun String.takeCodePoints(n: Int): String {
-    var count = 0
-    var i = 0
-    while (i < length && count < n) {
-        val c = this[i]
-        if (c.isHighSurrogate() && i + 1 < length && this[i + 1].isLowSurrogate()) {
-            i += 2
-        } else {
-            i++
-        }
-        count++
-    }
-    return substring(0, i)
 }
 
 private fun getGradeColor(grade: String): Color {

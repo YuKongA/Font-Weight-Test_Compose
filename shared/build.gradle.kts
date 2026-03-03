@@ -85,6 +85,7 @@ kotlin {
             api(libs.compose.components.resources)
             implementation(libs.miuix)
             implementation(libs.haze)
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
         }
     }
 }
