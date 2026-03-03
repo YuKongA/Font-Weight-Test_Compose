@@ -23,7 +23,7 @@
     <string name="unicode_coverage_start">チェック開始</string>
     <string name="unicode_coverage_running">チェック中...</string>
     <string name="unicode_coverage_progress">進捗: %1$d / %2$d (%3$s%)</string>
-    <string name="unicode_coverage_current">現在: %1$d (U+%2$d)</string>
+    <string name="unicode_coverage_current">現在: %1$s (U+%2$s)</string>
     <string name="unicode_coverage_ratio">比率: %1$d / %2$d (%3$s%)</string>
     <string name="unicode_coverage_duration">経過時間: %1$d ms</string>
     <string name="unicode_coverage_error">エラー: %1$s</string>
