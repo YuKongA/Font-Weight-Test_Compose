@@ -49,7 +49,7 @@ fun UnicodeCoverageView(
     viewModel: UnicodeCoverageViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val modeTabs = listOf("UNIHAN", "UNICODE")
+    val modeTabs = listOf("Unihan", "Unicode")
 
     val currentProgress = uiState.progress[uiState.mode]!!
     val currentResult = uiState.results[uiState.mode]

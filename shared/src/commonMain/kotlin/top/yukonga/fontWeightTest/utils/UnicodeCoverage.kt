@@ -216,6 +216,8 @@ private suspend fun loadHanScriptCodePoints(): IntArray {
             if (parts[1].trim() != "Han") return@forEach
             parseCodeRange(parts[0].trim())?.let { ranges.add(it) }
         }
+        val unicodeBlocks = loadUnicodeBlocks()
+        val hanBlockNames = buildHanBlockNames(ranges, unicodeBlocks)
         scriptExtensionsText.lineSequence().forEach { line ->
             val content = line.substringBefore('#').trim()
             if (content.isEmpty()) return@forEach
@@ -223,7 +225,10 @@ private suspend fun loadHanScriptCodePoints(): IntArray {
             if (parts.size < 2) return@forEach
             val scripts = parts[1].trim().split(' ')
             if (!scripts.contains("Hani")) return@forEach
-            parseCodeRange(parts[0].trim())?.let { ranges.add(it) }
+            val range = parseCodeRange(parts[0].trim()) ?: return@forEach
+            val block = findBlockForCodePoint(unicodeBlocks, range.first) ?: return@forEach
+            if (block.name !in hanBlockNames) return@forEach
+            ranges.add(range)
         }
 
         val mergedRanges = mergeRanges(ranges)
@@ -504,13 +509,40 @@ private fun mergeRanges(ranges: List<IntRange>): List<IntRange> {
     return merged
 }
 
+private fun findBlockForCodePoint(blocks: List<UnicodeBlock>, codePoint: Int): UnicodeBlock? {
+    var lo = 0
+    var hi = blocks.size - 1
+    while (lo <= hi) {
+        val mid = (lo + hi) ushr 1
+        val block = blocks[mid]
+        when {
+            codePoint > block.end -> lo = mid + 1
+            codePoint < block.start -> hi = mid - 1
+            else -> return block
+        }
+    }
+    return null
+}
+
+private fun buildHanBlockNames(hanRanges: List<IntRange>, blocks: List<UnicodeBlock>): Set<String> {
+    val names = HashSet<String>()
+    for (range in hanRanges) {
+        for (block in blocks) {
+            if (block.end < range.first) continue
+            if (block.start > range.last) break
+            names.add(block.name)
+        }
+    }
+    return names
+}
+
 private fun gradeFromScore(score: Double): String {
-    if (score >= 99.9999) return "PG"
-    if (score >= 96.0) return "EX"
-    if (score >= 90.0) return "A"
-    if (score >= 82.0) return "B"
-    if (score >= 70.0) return "C"
-    if (score >= 62.0) return "D"
-    if (score >= 42.0) return "E"
+    if (score >= 99.99) return "PG"
+    if (score >= 96) return "EX"
+    if (score >= 90) return "A"
+    if (score >= 82) return "B"
+    if (score >= 70) return "C"
+    if (score >= 62) return "D"
+    if (score >= 42) return "E"
     return "F"
 }
