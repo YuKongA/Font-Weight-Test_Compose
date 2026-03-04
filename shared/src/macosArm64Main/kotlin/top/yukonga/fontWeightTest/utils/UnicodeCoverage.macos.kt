@@ -1,31 +1,31 @@
 package top.yukonga.fontWeightTest.utils
 
 import platform.AppKit.NSFont
+import platform.AppKit.NSFontManager
+import platform.Foundation.NSMutableCharacterSet
 
 actual object UnicodeGlyphSupport {
-    private val fallbackFonts = listOfNotNull(
-        NSFont.systemFontOfSize(14.0),
-        NSFont.fontWithName("PingFang SC", 14.0),
-        NSFont.fontWithName("PingFang TC", 14.0),
-        NSFont.fontWithName("PingFang HK", 14.0),
-        NSFont.fontWithName("Hiragino Sans", 14.0),
-        NSFont.fontWithName("Hiragino Mincho ProN", 14.0),
-        NSFont.fontWithName("Songti SC", 14.0),
-        NSFont.fontWithName("Heiti SC", 14.0),
-        NSFont.fontWithName("Arial Unicode MS", 14.0)
-    )
-    private val characterSets = fallbackFonts.map { it.coveredCharacterSet }
+    private val combinedCharacterSet by lazy {
+        val mutableSet = NSMutableCharacterSet()
 
-    actual fun hasGlyph(codePoint: Int): Boolean {
-        val cp = codePoint.toUInt()
-        return characterSets.any { it.longCharacterIsMember(cp) }
+        @Suppress("UNCHECKED_CAST")
+        val fontNames = NSFontManager.sharedFontManager.availableFonts
+        fontNames.forEach { name ->
+            val fontName = name?.toString() ?: return@forEach
+            NSFont.fontWithName(fontName, 14.0)?.coveredCharacterSet?.let {
+                mutableSet.formUnionWithCharacterSet(it)
+            }
+        }
+        mutableSet
     }
 
+    actual fun hasGlyph(codePoint: Int): Boolean =
+        combinedCharacterSet.longCharacterIsMember(codePoint.toUInt())
+
     actual fun hasGlyphs(codePoints: IntArray): BooleanArray {
-        val results = BooleanArray(codePoints.size)
-        for (i in codePoints.indices) {
-            results[i] = hasGlyph(codePoints[i])
+        val set = combinedCharacterSet
+        return BooleanArray(codePoints.size) { i ->
+            set.longCharacterIsMember(codePoints[i].toUInt())
         }
-        return results
     }
 }
