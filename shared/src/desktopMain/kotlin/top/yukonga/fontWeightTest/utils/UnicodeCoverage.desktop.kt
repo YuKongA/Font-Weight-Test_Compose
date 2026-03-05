@@ -1,19 +1,20 @@
 package top.yukonga.fontWeightTest.utils
 
-import java.awt.Font
+import java.awt.GraphicsEnvironment
 
 actual object UnicodeGlyphSupport {
-    private val fallbackFont = Font("Dialog", Font.PLAIN, 14)
+    private val allFonts by lazy {
+        GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts
+    }
 
     actual fun hasGlyph(codePoint: Int): Boolean {
-        return fallbackFont.canDisplay(codePoint)
+        return allFonts.any { it.canDisplay(codePoint) }
     }
 
     actual fun hasGlyphs(codePoints: IntArray): BooleanArray {
-        val results = BooleanArray(codePoints.size)
-        for (i in codePoints.indices) {
-            results[i] = hasGlyph(codePoints[i])
+        val fonts = allFonts
+        return BooleanArray(codePoints.size) { i ->
+            fonts.any { it.canDisplay(codePoints[i]) }
         }
-        return results
     }
 }
