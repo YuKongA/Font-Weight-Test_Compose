@@ -3,6 +3,7 @@
 package top.yukonga.fontWeightTest.ui.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeImageBitmap
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -105,6 +107,7 @@ actual fun NativeVariableText(
     }
 
     val scale = 2.0
+    val density = LocalDensity.current.density
 
     val attrString = remember(text, font, color, textAlign) {
         val nsColor = NSColor.colorWithSRGBRed(
@@ -132,91 +135,93 @@ actual fun NativeVariableText(
         )
     }
 
-    val textSize: Pair<Double, Double> = remember(attrString, maxLines) {
-        val maxWidth = if (maxLines == 1) 100000.0 else 10000.0
-        val maxHeight = if (maxLines == Int.MAX_VALUE) 100000.0
-        else font.ascender + abs(font.descender) + (font.ascender + abs(font.descender) + font.leading) * (maxLines - 1)
-        attrString.boundingRectWithSize(
-            size = platform.CoreGraphics.CGSizeMake(maxWidth, maxHeight),
-            options = 1L,
-            context = null
-        ).useContents {
-            ceil(size.width) to ceil(size.height)
-        }
-    }
+    BoxWithConstraints(modifier = modifier) {
+        val containerWidthPt = constraints.maxWidth / density.toDouble()
 
-    val imageBitmap = remember(attrString, scale, textSize) {
-        val width = textSize.first
-        val height = textSize.second
-        if (width <= 0.0 || height <= 0.0) return@remember null
-
-        val pixelWidth = (width * scale).toInt()
-        val pixelHeight = (height * scale).toInt()
-        if (pixelWidth <= 0 || pixelHeight <= 0) return@remember null
-
-        val colorSpace = CGColorSpaceCreateDeviceRGB()
-        val context = CGBitmapContextCreate(
-            data = null,
-            width = pixelWidth.toULong(),
-            height = pixelHeight.toULong(),
-            bitsPerComponent = 8u,
-            bytesPerRow = (pixelWidth * 4).toULong(),
-            space = colorSpace,
-            bitmapInfo = BITMAP_INFO
-        )
-        CGColorSpaceRelease(colorSpace)
-        if (context == null) return@remember null
-
-        CGContextScaleCTM(context, scale, scale)
-
-        val nsContext = NSGraphicsContext.graphicsContextWithCGContext(context, flipped = true)
-        NSGraphicsContext.saveGraphicsState()
-        NSGraphicsContext.setCurrentContext(nsContext)
-
-        attrString.drawInRect(platform.CoreGraphics.CGRectMake(0.0, 0.0, width, height))
-
-        NSGraphicsContext.restoreGraphicsState()
-
-        val dataPtr = CGBitmapContextGetData(context)
-        if (dataPtr == null) {
-            CGContextRelease(context)
-            return@remember null
-        }
-
-        val byteCount = pixelWidth * pixelHeight * 4
-        val rawBytes = ByteArray(byteCount)
-        rawBytes.usePinned { pinned ->
-            memcpy(pinned.addressOf(0), dataPtr, byteCount.toULong())
-        }
-        CGContextRelease(context)
-
-        val rowBytes = pixelWidth * 4
-        val bytes = ByteArray(byteCount)
-        for (row in 0 until pixelHeight) {
-            rawBytes.copyInto(bytes, (pixelHeight - 1 - row) * rowBytes, row * rowBytes, (row + 1) * rowBytes)
-        }
-
-        val bitmap = Bitmap()
-        bitmap.allocPixels(ImageInfo(pixelWidth, pixelHeight, ColorType.BGRA_8888, ColorAlphaType.PREMUL))
-        bitmap.installPixels(bytes)
-        bitmap.asComposeImageBitmap()
-    }
-
-    val sizeModifier = Modifier.width(textSize.first.dp).height(textSize.second.dp)
-
-    if (imageBitmap != null) {
-        Canvas(modifier = modifier.then(sizeModifier)) {
-            val offsetX = when (textAlign) {
-                TextAlign.Center -> ((size.width - imageBitmap.width) / 2f).toInt()
-                TextAlign.End, TextAlign.Right -> (size.width - imageBitmap.width).toInt()
-                else -> 0
+        val textSize: Pair<Double, Double> = remember(attrString, maxLines, containerWidthPt) {
+            val measureWidth = if (maxLines == 1) 100000.0 else containerWidthPt
+            val maxHeight = if (maxLines == Int.MAX_VALUE) 100000.0
+            else font.ascender + abs(font.descender) + (font.ascender + abs(font.descender) + font.leading) * (maxLines - 1)
+            attrString.boundingRectWithSize(
+                size = platform.CoreGraphics.CGSizeMake(measureWidth, maxHeight),
+                options = 1L,
+                context = null
+            ).useContents {
+                ceil(size.width) to ceil(size.height)
             }
-            drawImage(
-                image = imageBitmap,
-                dstOffset = IntOffset(offsetX, 0),
-                srcSize = IntSize(imageBitmap.width, imageBitmap.height),
-                dstSize = IntSize(imageBitmap.width, imageBitmap.height)
+        }
+
+        val imageBitmap = remember(attrString, scale, textSize) {
+            val width = textSize.first
+            val height = textSize.second
+            if (width <= 0.0 || height <= 0.0) return@remember null
+
+            val pixelWidth = (width * scale).toInt()
+            val pixelHeight = (height * scale).toInt()
+            if (pixelWidth <= 0 || pixelHeight <= 0) return@remember null
+
+            val colorSpace = CGColorSpaceCreateDeviceRGB()
+            val context = CGBitmapContextCreate(
+                data = null,
+                width = pixelWidth.toULong(),
+                height = pixelHeight.toULong(),
+                bitsPerComponent = 8u,
+                bytesPerRow = (pixelWidth * 4).toULong(),
+                space = colorSpace,
+                bitmapInfo = BITMAP_INFO
             )
+            CGColorSpaceRelease(colorSpace)
+            if (context == null) return@remember null
+
+            CGContextScaleCTM(context, scale, scale)
+
+            val nsContext = NSGraphicsContext.graphicsContextWithCGContext(context, flipped = true)
+            NSGraphicsContext.saveGraphicsState()
+            NSGraphicsContext.setCurrentContext(nsContext)
+
+            attrString.drawInRect(platform.CoreGraphics.CGRectMake(0.0, 0.0, width, height))
+
+            NSGraphicsContext.restoreGraphicsState()
+
+            val dataPtr = CGBitmapContextGetData(context)
+            if (dataPtr == null) {
+                CGContextRelease(context)
+                return@remember null
+            }
+
+            val byteCount = pixelWidth * pixelHeight * 4
+            val rawBytes = ByteArray(byteCount)
+            rawBytes.usePinned { pinned ->
+                memcpy(pinned.addressOf(0), dataPtr, byteCount.toULong())
+            }
+            CGContextRelease(context)
+
+            val rowBytes = pixelWidth * 4
+            val bytes = ByteArray(byteCount)
+            for (row in 0 until pixelHeight) {
+                rawBytes.copyInto(bytes, (pixelHeight - 1 - row) * rowBytes, row * rowBytes, (row + 1) * rowBytes)
+            }
+
+            val bitmap = Bitmap()
+            bitmap.allocPixels(ImageInfo(pixelWidth, pixelHeight, ColorType.BGRA_8888, ColorAlphaType.PREMUL))
+            bitmap.installPixels(bytes)
+            bitmap.asComposeImageBitmap()
+        }
+
+        if (imageBitmap != null) {
+            Canvas(modifier = Modifier.width(textSize.first.dp).height(textSize.second.dp)) {
+                val offsetX = when (textAlign) {
+                    TextAlign.Center -> ((size.width - imageBitmap.width) / 2f).toInt()
+                    TextAlign.End, TextAlign.Right -> (size.width - imageBitmap.width).toInt()
+                    else -> 0
+                }
+                drawImage(
+                    image = imageBitmap,
+                    dstOffset = IntOffset(offsetX, 0),
+                    srcSize = IntSize(imageBitmap.width, imageBitmap.height),
+                    dstSize = IntSize(imageBitmap.width, imageBitmap.height)
+                )
+            }
         }
     }
 }
