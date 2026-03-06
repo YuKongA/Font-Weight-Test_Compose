@@ -8,15 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import top.yukonga.fontWeightTest.utils.fontWeightsList
-import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
-fun OtherTestView(fontFamily: FontFamily? = null) {
+fun OtherTestView(fontFamily: FontFamily = FontFamily.Default) {
     val testText = "不以物喜，不以己悲。——范仲淹《岳阳楼记》\n" +
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n" +
             "abcdefghijklmnopqrstuvwxyz\n" +
@@ -45,7 +43,7 @@ private fun OtherTestTextItem(
     index: Int,
     text: String,
     fontWeight: androidx.compose.ui.text.font.FontWeight,
-    fontFamily: FontFamily?
+    fontFamily: FontFamily
 ) {
     val label = "- ${(index + 1) * 100} -"
 
@@ -53,27 +51,30 @@ private fun OtherTestTextItem(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
+        NativeVariableText(
             text = label,
-            fontWeight = fontWeight,
+            fontSize = 16f,
+            fontWeight = fontWeight.weight,
+            color = MiuixTheme.colorScheme.onBackground,
             fontFamily = fontFamily,
-            textAlign = TextAlign.Center,
-            fontSize = 16.sp
+            textAlign = TextAlign.Center
         )
-        Text(
+        NativeVariableText(
             text = text,
-            fontWeight = fontWeight,
+            fontSize = 16f,
+            fontWeight = fontWeight.weight,
+            color = MiuixTheme.colorScheme.onBackground,
             fontFamily = fontFamily,
-            textAlign = TextAlign.Center,
-            fontSize = 16.sp
+            textAlign = TextAlign.Center
         )
-        Text(
+        NativeVariableText(
             text = text,
-            fontWeight = fontWeight,
+            fontSize = 16f,
+            fontWeight = fontWeight.weight,
+            color = MiuixTheme.colorScheme.onBackground,
+            italic = true,
             fontFamily = fontFamily,
-            fontStyle = FontStyle.Italic,
-            textAlign = TextAlign.Center,
-            fontSize = 16.sp
+            textAlign = TextAlign.Center
         )
     }
 }

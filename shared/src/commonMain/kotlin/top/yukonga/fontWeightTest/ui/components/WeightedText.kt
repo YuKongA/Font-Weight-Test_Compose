@@ -1,11 +1,12 @@
 package top.yukonga.fontWeightTest.ui.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.sp
 import top.yukonga.fontWeightTest.utils.fontWeightsList
-import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun WeightTextView(
@@ -18,28 +19,15 @@ fun WeightTextView(
     }
 
     fontWeightsList.forEachIndexed { index, fontWeight ->
-        WeightTextItem(
+        NativeVariableText(
             text = labels[index],
-            fontWeight = fontWeight,
+            fontSize = 15.4f,
+            fontWeight = fontWeight.weight,
+            color = MiuixTheme.colorScheme.onBackground,
+            italic = fontStyle == FontStyle.Italic,
             fontFamily = fontFamily,
-            fontStyle = fontStyle
+            maxLines = 1,
+            modifier = Modifier.fillMaxWidth()
         )
     }
-}
-
-@Composable
-private fun WeightTextItem(
-    text: String,
-    fontWeight: androidx.compose.ui.text.font.FontWeight,
-    fontFamily: FontFamily,
-    fontStyle: FontStyle
-) {
-    Text(
-        text = text,
-        fontWeight = fontWeight,
-        fontFamily = fontFamily,
-        fontStyle = fontStyle,
-        fontSize = 15.4.sp,
-        maxLines = 1
-    )
 }

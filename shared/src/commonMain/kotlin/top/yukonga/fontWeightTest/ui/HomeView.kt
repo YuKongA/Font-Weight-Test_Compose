@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -41,6 +42,7 @@ import fontweighttest.shared.generated.resources.variable_font
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.fontWeightTest.ui.components.CardView
+import top.yukonga.fontWeightTest.ui.components.NativeVariableText
 import top.yukonga.fontWeightTest.ui.viewmodel.HomeViewModel
 import top.yukonga.fontWeightTest.utils.fontWeightDescriptions
 import top.yukonga.fontWeightTest.utils.fontWeightsList
@@ -50,6 +52,7 @@ import top.yukonga.miuix.kmp.basic.Slider
 import top.yukonga.miuix.kmp.basic.SmallTitle
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextField
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 
@@ -139,10 +142,13 @@ fun AllWeightText() {
 
 @Composable
 fun WeightText(description: String, fontWeight: FontWeight) {
-    Text(
+    NativeVariableText(
         text = description,
-        fontWeight = fontWeight,
-        maxLines = 1
+        fontSize = 16f,
+        fontWeight = fontWeight.weight,
+        color = MiuixTheme.colorScheme.onBackground,
+        maxLines = 1,
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
@@ -177,13 +183,13 @@ fun DeviceFontTestView(text: String) {
 
 @Composable
 fun MoreTestText(text: String) {
-    val weightList = fontWeightsList
-
     Row {
-        weightList.forEach { fontWeight ->
-            Text(
+        fontWeightsList.forEach { fontWeight ->
+            NativeVariableText(
                 text = text,
-                fontWeight = fontWeight
+                fontSize = 16f,
+                fontWeight = fontWeight.weight,
+                color = MiuixTheme.colorScheme.onBackground
             )
         }
     }
@@ -227,11 +233,12 @@ fun SliderTestView(
             focusManager = focusManager
         )
 
-        Text(
-            modifier = Modifier.padding(top = 12.dp),
+        NativeVariableText(
             text = uiState.fontDisplayState.displayText,
-            fontSize = uiState.fontDisplayState.effectiveFontSize.sp,
-            fontWeight = uiState.fontDisplayState.effectiveFontWeight,
+            fontSize = uiState.fontDisplayState.effectiveFontSize.toFloat(),
+            fontWeight = uiState.fontDisplayState.effectiveFontWeight.weight,
+            color = MiuixTheme.colorScheme.onBackground,
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
         )
     }
 }
