@@ -18,6 +18,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import dev.chrisbanes.haze.ExperimentalHazeApi
+import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
@@ -54,6 +56,7 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 val LocalPagerState = compositionLocalOf<PagerState> { error("No pager state") }
 val LocalHandlePageChange = compositionLocalOf<(Int) -> Unit> { error("No handle page change") }
 
+@OptIn(ExperimentalHazeApi::class)
 @Composable
 fun App(
     isDarkTheme: Boolean = isSystemInDarkTheme()
@@ -85,13 +88,10 @@ fun App(
         )
 
         val hazeState = remember { HazeState() }
-        val surface = MiuixTheme.colorScheme.surface
-        val hazeStyle = remember(surface) {
-            HazeStyle(
-                backgroundColor = surface,
-                tint = HazeTint(surface.copy(0.67f))
-            )
-        }
+        val hazeStyle = HazeStyle(
+            backgroundColor = MiuixTheme.colorScheme.surface,
+            tint = HazeTint(MiuixTheme.colorScheme.surface.copy(0.8f)),
+        )
 
         CompositionLocalProvider(
             LocalPagerState provides pagerState,
@@ -111,11 +111,17 @@ fun App(
                 bottomBar = {
                     NavigationBar(
                         color = Color.Transparent,
-                        modifier = Modifier.hazeEffect(hazeState) {
-                            style = hazeStyle
-                            blurRadius = 25.dp
-                            noiseFactor = 0f
-                        }
+                        modifier = Modifier
+                            .hazeEffect(
+                                state = hazeState,
+                                style = hazeStyle
+                            ) {
+                                blurRadius = 20.dp
+                                expandLayerBounds = false
+                                forceInvalidateOnPreDraw = false
+                                inputScale = HazeInputScale.Fixed(0.25f)
+                                noiseFactor = 0f
+                            }
                     ) {
                         navigationItems.forEachIndexed { index, item ->
                             NavigationBarItem(
@@ -139,6 +145,7 @@ fun App(
     }
 }
 
+@OptIn(ExperimentalHazeApi::class)
 @Composable
 private fun TopAppBarContent(
     currentScrollBehavior: ScrollBehavior,
@@ -147,11 +154,17 @@ private fun TopAppBarContent(
 ) {
     BoxWithConstraints {
         val isCompact = maxWidth < 768.dp
-        val modifier = Modifier.hazeEffect(hazeState) {
-            style = hazeStyle
-            blurRadius = 25.dp
-            noiseFactor = 0f
-        }
+        val modifier = Modifier
+            .hazeEffect(
+                state = hazeState,
+                style = hazeStyle
+            ) {
+                blurRadius = 20.dp
+                expandLayerBounds = false
+                forceInvalidateOnPreDraw = false
+                inputScale = HazeInputScale.Fixed(0.25f)
+                noiseFactor = 0f
+            }
 
         if (isCompact) {
             TopAppBar(
@@ -183,8 +196,6 @@ private fun PagerContent(
     HorizontalPager(
         modifier = Modifier.hazeSource(state = hazeState),
         state = pagerState,
-        beyondViewportPageCount = 5,
-        userScrollEnabled = false,
         pageContent = { page ->
             key(page) {
                 when (page) {

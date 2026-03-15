@@ -40,6 +40,7 @@ fun UnicodeCoveragePage(
             end = padding.calculateEndPadding(layoutDirection),
             bottom = padding.calculateBottomPadding() + 12.dp
         ),
+        overscrollEffect = null,
     ) {
         item(key = "unicode_coverage_title") {
             SmallTitle(text = stringResource(Res.string.unicode_coverage))

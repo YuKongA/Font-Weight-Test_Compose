@@ -43,6 +43,7 @@ fun SansSerifPage(
             end = padding.calculateEndPadding(layoutDirection),
             bottom = padding.calculateBottomPadding() + 12.dp
         ),
+        overscrollEffect = null,
     ) {
         item(key = "normal_font") {
             CardView {

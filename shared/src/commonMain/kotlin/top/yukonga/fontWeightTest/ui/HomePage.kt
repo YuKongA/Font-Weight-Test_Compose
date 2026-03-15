@@ -82,6 +82,7 @@ fun HomePage(
             end = padding.calculateEndPadding(layoutDirection),
             bottom = padding.calculateBottomPadding() + 12.dp
         ),
+        overscrollEffect = null,
     ) {
         homeContent(viewModel)
     }

@@ -63,7 +63,7 @@ fun AboutDialog() {
     }
 
     SuperDialog(
-        show = showDialog,
+        show = showDialog.value,
         title = stringResource(Res.string.about),
         onDismissRequest = { showDialog.value = false },
         content = {
