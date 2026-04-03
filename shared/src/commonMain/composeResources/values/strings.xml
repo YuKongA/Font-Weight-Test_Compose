@@ -18,7 +18,6 @@
     <string name="font_weight">Weight</string>
     <string name="font_size">Size</string>
     <string name="about">About</string>
-    <string name="unicode_coverage">Unicode coverage</string>
     <string name="unicode_nav">Unicode</string>
     <string name="unicode_coverage_start">Coverage check</string>
     <string name="unicode_coverage_running">Checking coverage...</string>

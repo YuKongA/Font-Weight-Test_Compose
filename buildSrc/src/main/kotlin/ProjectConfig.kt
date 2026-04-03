@@ -2,14 +2,15 @@ object ProjectConfig {
     const val JVM_VERSION = 21
     const val APP_NAME = "FontWeightTest"
     const val PACKAGE_NAME = "top.yukonga.fontWeightTest"
-    const val VERSION_NAME = "1.6.4"
+    const val VERSION_NAME = "1.6.5"
     val VERSION_CODE = getGitVersionCode() + 100
 
     object Android {
-        const val TARGET_SDK = 36
+        const val TARGET_SDK = 37
         const val MIN_SDK = 26
-        const val COMPILE_SDK = 36
-        const val BUILD_TOOLS_VERSION = "36.1.0"
+        const val COMPILE_SDK = 37
+        const val COMPILE_SDK_MINOR = 0
+        const val BUILD_TOOLS_VERSION = "37.0.0"
     }
 
     private fun getGitVersionCode(): Int {

@@ -17,9 +17,12 @@ dependencies {
 }
 
 android {
-    namespace = ProjectConfig.PACKAGE_NAME
-    compileSdk = ProjectConfig.Android.COMPILE_SDK
     buildToolsVersion = ProjectConfig.Android.BUILD_TOOLS_VERSION
+    compileSdk {
+        version = release(ProjectConfig.Android.COMPILE_SDK) {
+            minorApiLevel = ProjectConfig.Android.COMPILE_SDK_MINOR
+        }
+    }
     defaultConfig {
         applicationId = ProjectConfig.PACKAGE_NAME
         versionCode = ProjectConfig.VERSION_CODE
@@ -27,6 +30,7 @@ android {
         targetSdk = ProjectConfig.Android.TARGET_SDK
         minSdk = ProjectConfig.Android.MIN_SDK
     }
+    namespace = ProjectConfig.PACKAGE_NAME
     val properties = Properties()
     runCatching { properties.load(project.rootProject.file("local.properties").inputStream()) }
     val keystorePath = properties.getProperty("KEYSTORE_PATH") ?: System.getenv("KEYSTORE_PATH")

@@ -18,7 +18,6 @@
     <string name="font_weight">太さ</string>
     <string name="font_size">サイズ</string>
     <string name="about">アプリについて</string>
-    <string name="unicode_coverage">Unicode 範囲</string>
     <string name="unicode_nav">Unicode</string>
     <string name="unicode_coverage_start">チェック開始</string>
     <string name="unicode_coverage_running">チェック中...</string>

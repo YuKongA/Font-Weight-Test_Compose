@@ -38,7 +38,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.extra.SuperDialog
+import top.yukonga.miuix.kmp.overlay.OverlayDialog
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
@@ -47,7 +47,6 @@ fun AboutDialog() {
     val hapticFeedback = LocalHapticFeedback.current
 
     IconButton(
-        modifier = Modifier.padding(start = 18.dp),
         onClick = {
             showDialog.value = true
             hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
@@ -62,7 +61,7 @@ fun AboutDialog() {
         )
     }
 
-    SuperDialog(
+    OverlayDialog(
         show = showDialog.value,
         title = stringResource(Res.string.about),
         onDismissRequest = { showDialog.value = false },

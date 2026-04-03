@@ -18,7 +18,6 @@
     <string name="font_weight">굵기</string>
     <string name="font_size">크기</string>
     <string name="about">정보</string>
-    <string name="unicode_coverage">Unicode 범위</string>
     <string name="unicode_nav">Unicode</string>
     <string name="unicode_coverage_start">검사 시작</string>
     <string name="unicode_coverage_running">검사 중...</string>

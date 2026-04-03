@@ -6,13 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,9 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -32,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fontweighttest.shared.generated.resources.MiSansVF
 import fontweighttest.shared.generated.resources.Res
+import fontweighttest.shared.generated.resources.app_name
 import fontweighttest.shared.generated.resources.clear_text
 import fontweighttest.shared.generated.resources.comparison_display
 import fontweighttest.shared.generated.resources.custom_text
@@ -43,6 +38,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 import top.yukonga.fontWeightTest.ui.components.CardView
 import top.yukonga.fontWeightTest.ui.components.NativeVariableText
+import top.yukonga.fontWeightTest.ui.components.PageScaffold
 import top.yukonga.fontWeightTest.ui.viewmodel.HomeViewModel
 import top.yukonga.fontWeightTest.utils.fontWeightDescriptions
 import top.yukonga.fontWeightTest.utils.fontWeightsList
@@ -53,8 +49,6 @@ import top.yukonga.miuix.kmp.basic.SmallTitle
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.utils.overScrollVertical
-import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 
 @Composable
 fun HomePage(
@@ -63,26 +57,16 @@ fun HomePage(
     viewModel: HomeViewModel = viewModel { HomeViewModel() }
 ) {
     val focusManager = LocalFocusManager.current
-    val layoutDirection = LocalLayoutDirection.current
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxHeight()
-            .scrollEndHaptic()
-            .overScrollVertical()
-            .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
-            .clickable(
-                indication = null,
-                interactionSource = null,
-                onClick = { focusManager.clearFocus() }
-            ),
-        contentPadding = PaddingValues(
-            top = padding.calculateTopPadding() + 12.dp,
-            start = padding.calculateStartPadding(layoutDirection),
-            end = padding.calculateEndPadding(layoutDirection),
-            bottom = padding.calculateBottomPadding() + 12.dp
-        ),
-        overscrollEffect = null,
+    PageScaffold(
+        title = stringResource(Res.string.app_name),
+        topAppBarScrollBehavior = topAppBarScrollBehavior,
+        padding = padding,
+        modifier = Modifier.clickable(
+            indication = null,
+            interactionSource = null,
+            onClick = { focusManager.clearFocus() }
+        )
     ) {
         homeContent(viewModel)
     }

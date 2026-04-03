@@ -32,7 +32,11 @@ kotlin {
     android {
         androidResources.enable = true
         buildToolsVersion = ProjectConfig.Android.BUILD_TOOLS_VERSION
-        compileSdk = ProjectConfig.Android.COMPILE_SDK
+        compileSdk {
+            version = release(ProjectConfig.Android.COMPILE_SDK) {
+                minorApiLevel = ProjectConfig.Android.COMPILE_SDK_MINOR
+            }
+        }
         minSdk = ProjectConfig.Android.MIN_SDK
         namespace = "${ProjectConfig.PACKAGE_NAME}.shared"
     }
@@ -60,8 +64,9 @@ kotlin {
         }
         commonMain.dependencies {
             api(libs.compose.components.resources)
-            implementation(libs.miuix)
-            implementation(libs.haze)
+            implementation(libs.miuix.ui)
+            implementation(libs.miuix.blur)
+            implementation(libs.miuix.preference)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
         }
     }

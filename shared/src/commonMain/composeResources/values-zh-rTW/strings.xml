@@ -18,7 +18,6 @@
     <string name="font_weight">字重</string>
     <string name="font_size">字號</string>
     <string name="about">關於</string>
-    <string name="unicode_coverage">Unicode 覆蓋率</string>
     <string name="unicode_nav">Unicode</string>
     <string name="unicode_coverage_start">覆蓋率檢查</string>
     <string name="unicode_coverage_running">正在檢查覆蓋率...</string>

@@ -41,7 +41,7 @@ import top.yukonga.miuix.kmp.basic.SmallTitle
 import top.yukonga.miuix.kmp.basic.TabRow
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.extra.SuperCheckbox
+import top.yukonga.miuix.kmp.preference.CheckboxPreference
 import kotlin.math.roundToInt
 
 @Composable
@@ -204,7 +204,7 @@ fun UnicodeCoverageView(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp),
         ) {
-            SuperCheckbox(
+            CheckboxPreference(
                 title = stringResource(Res.string.unicode_coverage_hide_perfect),
                 checked = uiState.hidePerfectBlocks,
                 onCheckedChange = viewModel::toggleHidePerfectBlocks,
